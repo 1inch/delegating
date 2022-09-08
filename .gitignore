@@ -1,0 +1,12 @@
+artifacts
+cache
+node_modules
+coverage
+coverage.json
+build
+dist
+hardhat-dependency-compiler
+.coverage_contracts
+.coverage_artifacts
+.env
+.idea

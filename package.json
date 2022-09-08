@@ -1,0 +1,61 @@
+{
+    "name": "@1inch/delegating",
+    "version": "1.0.3",
+    "description": "Set of contracts for delegating incentives",
+    "homepage": "https://github.com/1inch/delegating#readme",
+    "author": "1inch",
+    "files": [
+        "/contracts/**/*.sol",
+        "/artifacts/contracts/**/*.json",
+        "/test/utils.js",
+        "/test/behaviors/*.js"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:1inch/delegating.git"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@1inch/solidity-utils": "2.0.25",
+        "@openzeppelin/contracts": "4.5.0"
+    },
+    "devDependencies": {
+        "@nomiclabs/hardhat-ethers": "2.0.5",
+        "@nomiclabs/hardhat-etherscan": "3.0.3",
+        "@nomiclabs/hardhat-truffle5": "2.0.5",
+        "@nomiclabs/hardhat-web3": "2.0.0",
+        "@openzeppelin/test-helpers": "0.5.15",
+        "acquit": "1.2.1",
+        "acquit-markdown": "https://github.com/vkarpov15/acquit-markdown.git#83ccd44",
+        "chai": "4.3.6",
+        "dotenv": "16.0.0",
+        "eslint": "8.13.0",
+        "eslint-config-standard": "16.0.3",
+        "eslint-plugin-import": "2.26.0",
+        "eslint-plugin-node": "11.1.0",
+        "eslint-plugin-promise": "6.0.0",
+        "eslint-plugin-standard": "5.0.0",
+        "ethers": "5.6.2",
+        "hardhat": "2.9.3",
+        "hardhat-dependency-compiler": "1.1.3",
+        "hardhat-deploy": "0.11.4",
+        "hardhat-gas-reporter": "1.0.8",
+        "rimraf": "3.0.2",
+        "solhint": "3.3.7",
+        "solidity-coverage": "0.7.20"
+    },
+    "scripts": {
+        "test": "hardhat test --show-stack-traces --parallel",
+        "test:ci": "hardhat test --show-stack-traces",
+        "clean": "rimraf artifacts cache coverage contracts/hardhat-dependency-compiler",
+        "deploy": "hardhat deploy --network",
+        "build": "rimraf ./dist && mkdir dist && cp package.json ./dist && cp README.md ./dist && cp -R ./contracts ./dist/contracts",
+        "coverage": "hardhat coverage",
+        "lint:js": "eslint .",
+        "lint:js:fix": "eslint . --fix",
+        "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
+        "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
+        "lint": "yarn run lint:js && yarn run lint:sol",
+        "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix"
+    }
+}
