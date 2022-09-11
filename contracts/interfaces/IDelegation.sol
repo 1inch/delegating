@@ -10,5 +10,5 @@ interface IDelegation is IERC20 {
 
     function delegated(address account) external view returns(address);
     function setDelegate(address account, address delegatee) external; // onlyOwner
-    function updateBalances(address from, address to, uint256 amount) external; // onlyOwner 
+    function updateBalances(address from, address to, uint256 amount) external; // onlyOwner
 }

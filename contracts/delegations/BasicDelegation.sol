@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "../interfaces/IDelegation.sol";
 
-// @notice It should neccussary to give owner role for ERC20Delegatable contract via `ownerTransfership`
+// @notice It should neccussary to give owner role equals to ERC20Delegatable contract via `ownerTransfership`
 contract BasicDelegation is IDelegation, ERC20, Ownable {
     error MethodDisabled();
 

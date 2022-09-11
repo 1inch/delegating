@@ -7,7 +7,7 @@ const WrongDelegation = artifacts.require('WrongDelegation');
 
 const MAX_USER_DELEGATIONS = 7;
 
-describe('WhitelistRegistrySimple', async () => {
+describe('ERC20Delegatable', async () => {
     let addr1, addr2, addr3, delegatee, newDelegatee;
 
     before(async () => {
@@ -28,13 +28,13 @@ describe('WhitelistRegistrySimple', async () => {
             this.delegations[i] = await BasicDelegation.new(`DelegationContract${i}`, `DC${i}`);
             await this.delegations[i].transferOwnership(this.erc20delegatable.address);
         }
-    }
+    };
 
     const delegate = async (delegations, delegatee, delegator) => {
         for (const delegation of delegations) {
             await this.erc20delegatable.delegate(delegation.address, delegatee, { from: delegator });
         }
-    }
+    };
 
     describe('userIsDelegating', async () => {
         it('should return true if account delegate', async () => {
@@ -196,37 +196,37 @@ describe('WhitelistRegistrySimple', async () => {
 
         describe('should not revert when delegation contract methods', async () => {
             it('reverting at `delegated`', async () => {
-                await this.wrongDelegation.setMethodReverting("delegated", true);
+                await this.wrongDelegation.setMethodReverting('delegated', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
 
             it('has OutOfGas at `delegated`', async () => {
-                await this.wrongDelegation.setMethodOutOfGas("delegated", true);
+                await this.wrongDelegation.setMethodOutOfGas('delegated', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
 
             it('reverting at `setDelegate`', async () => {
-                await this.wrongDelegation.setMethodReverting("setDelegate", true);
+                await this.wrongDelegation.setMethodReverting('setDelegate', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
 
             it('has OutOfGas at `setDelegate`', async () => {
-                await this.wrongDelegation.setMethodOutOfGas("setDelegate", true);
+                await this.wrongDelegation.setMethodOutOfGas('setDelegate', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
 
             it('reverting at `updateBalances`', async () => {
-                await this.wrongDelegation.setMethodReverting("updateBalances", true);
+                await this.wrongDelegation.setMethodReverting('updateBalances', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
 
             it('has OutOfGas at `updateBalances`', async () => {
-                await this.wrongDelegation.setMethodOutOfGas("updateBalances", true);
+                await this.wrongDelegation.setMethodOutOfGas('updateBalances', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
@@ -266,25 +266,25 @@ describe('WhitelistRegistrySimple', async () => {
 
         describe('should not revert when delegation contract methods', async () => {
             it('reverting at setDelegate', async () => {
-                await this.wrongDelegation.setMethodReverting("setDelegate", true);
+                await this.wrongDelegation.setMethodReverting('setDelegate', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
 
             it('has OutOfGas at setDelegate', async () => {
-                await this.wrongDelegation.setMethodOutOfGas("setDelegate", true);
+                await this.wrongDelegation.setMethodOutOfGas('setDelegate', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
 
             it('reverting at updateBalances', async () => {
-                await this.wrongDelegation.setMethodReverting("updateBalances", true);
+                await this.wrongDelegation.setMethodReverting('updateBalances', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
 
             it('has OutOfGas at updateBalances', async () => {
-                await this.wrongDelegation.setMethodOutOfGas("updateBalances", true);
+                await this.wrongDelegation.setMethodOutOfGas('updateBalances', true);
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
                 expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(true);
             });
@@ -413,7 +413,7 @@ describe('WhitelistRegistrySimple', async () => {
 
         describe('should not revert when delegation contract methods reverting', async () => {
             beforeEach(async () => {
-                await this.wrongDelegation.setMethodReverting("updateBalances", true);
+                await this.wrongDelegation.setMethodReverting('updateBalances', true);
                 await this.erc20delegatable.undelegate(this.delegations[0].address, { from: addr1 });
                 await this.erc20delegatable.undelegate(this.delegations[0].address, { from: addr2 });
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
@@ -437,7 +437,7 @@ describe('WhitelistRegistrySimple', async () => {
 
         describe('should not revert when delegation contract methods has OutOfGas', async () => {
             beforeEach(async () => {
-                await this.wrongDelegation.setMethodOutOfGas("updateBalances", true);
+                await this.wrongDelegation.setMethodOutOfGas('updateBalances', true);
                 await this.erc20delegatable.undelegate(this.delegations[0].address, { from: addr1 });
                 await this.erc20delegatable.undelegate(this.delegations[0].address, { from: addr2 });
                 await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
