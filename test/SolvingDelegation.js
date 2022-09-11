@@ -18,7 +18,7 @@ describe('SolvingDelegation', async () => {
 
     describe('register', async () => {
         describe('register(string,string)', async () => {
-            it('should registrate delegee and create new token', async () => {
+            it('should registrate delegatee and create new token', async () => {
                 expect(await this.solvingDelegation.registration(delegatee)).to.be.equals(constants.ZERO_ADDRESS);
                 await this.solvingDelegation.contract.methods.register('1INCHSolverTokenName', '1INCHSolverTokenSymbol').send({ from: delegatee });
                 const delegateeToken = await hre.ethers.getContractAt('SolvingDelegateeToken', await this.solvingDelegation.registration(delegatee));
@@ -34,10 +34,16 @@ describe('SolvingDelegation', async () => {
                 await expect(delegateeToken.burn(addr1, '1000'))
                     .to.eventually.be.rejectedWith('Ownable: caller is not the owner');
             });
+
+            it('should not double registrate', async () => {
+                await this.solvingDelegation.contract.methods.register('1INCHSolverTokenName', '1INCHSolverTokenSymbol').send({ from: delegatee });
+                await expect(this.solvingDelegation.contract.methods.register('1INCHSolverTokenName2', '1INCHSolverTokenSymbol2').send({ from: delegatee }))
+                    .to.eventually.be.rejectedWith('AlreadyRegistered()');
+            });
         });
 
         describe('register(IDelegateeToken)', async () => {
-            it('should registrate delegee', async () => {
+            it('should registrate delegatee', async () => {
                 const delegateeToken = await SolvingDelegateeToken.new('1INCHSolverTokenName', '1INCHSolverTokenSymbol', { from: delegatee });
                 await this.solvingDelegation.contract.methods.register(delegateeToken.address).send({ from: delegatee });
                 expect(await this.solvingDelegation.registration(delegatee)).to.be.equals(delegateeToken.address);
@@ -46,8 +52,15 @@ describe('SolvingDelegation', async () => {
             it('should not registrate with already used token', async () => {
                 await this.solvingDelegation.contract.methods.register('1INCHSolverTokenName', '1INCHSolverTokenSymbol').send({ from: delegatee });
                 const delegateeToken = await hre.ethers.getContractAt('SolvingDelegateeToken', await this.solvingDelegation.registration(delegatee));
-                await expect(this.solvingDelegation.contract.methods.register(delegateeToken.address).send({ from: delegatee }))
+                await expect(this.solvingDelegation.contract.methods.register(delegateeToken.address).send({ from: newDelegatee }))
                     .to.eventually.be.rejectedWith('AnotherDelegateeToken()');
+            });
+
+            it('should not double registrate', async () => {
+                const delegateeToken = await SolvingDelegateeToken.new('1INCHSolverTokenName', '1INCHSolverTokenSymbol', { from: delegatee });
+                await this.solvingDelegation.contract.methods.register(delegateeToken.address).send({ from: delegatee });
+                await expect(this.solvingDelegation.contract.methods.register(delegateeToken.address).send({ from: delegatee }))
+                    .to.eventually.be.rejectedWith('AlreadyRegistered()');
             });
         });
     });

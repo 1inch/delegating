@@ -11,10 +11,16 @@ contract SolvingDelegation is BasicDelegation {
     using AddressSet for AddressSet.Data;
 
     error NotRegisteredDelegatee();
+    error AlreadyRegistered();
     error AnotherDelegateeToken();
 
     mapping(address => IDelegateeToken) public registration;
     AddressSet.Data private _delegateeTokens;
+
+    modifier onlyOneTime() {
+        if (address(registration[msg.sender]) != address(0)) revert AlreadyRegistered();
+        _;
+    }
 
     constructor(string memory name_, string memory symbol_) BasicDelegation(name_, symbol_) {}
 
@@ -34,14 +40,14 @@ contract SolvingDelegation is BasicDelegation {
         }
     }
 
-    function register(string memory name_, string memory symbol_) external returns(IDelegateeToken) {
+    function register(string memory name_, string memory symbol_) external onlyOneTime returns(IDelegateeToken) {
         registration[msg.sender] = new SolvingDelegateeToken(name_, symbol_);
         _delegateeTokens.add(address(registration[msg.sender]));
         return registration[msg.sender];
     }
 
     // @notice It's neccussary to give token's owner role equals to SolvingDelegation contract via `ownerTransfership`
-    function register(IDelegateeToken token) external {
+    function register(IDelegateeToken token) external onlyOneTime {
         if (_delegateeTokens.contains(address(token))) revert AnotherDelegateeToken();
         registration[msg.sender] = token;
         _delegateeTokens.add(address(token));
