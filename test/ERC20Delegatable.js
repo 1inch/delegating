@@ -1,4 +1,4 @@
-const { constants, expect, ether, toBN } = require('@1inch/solidity-utils');
+const { constants, expect, ether } = require('@1inch/solidity-utils');
 const { artifacts } = require('hardhat');
 
 const ERC20DelegatableMock = artifacts.require('ERC20DelegatableMock');
