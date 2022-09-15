@@ -4,10 +4,10 @@ pragma solidity ^0.8.0;
 
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 import "./BasicDelegation.sol";
-import "./SolvingDelegateeToken.sol";
+import "./DelegateeToken.sol";
 import "../interfaces/IDelegateeToken.sol";
 
-contract SolvingDelegation is BasicDelegation {
+contract RewardableDelegation is BasicDelegation {
     using AddressSet for AddressSet.Data;
 
     error NotRegisteredDelegatee();
@@ -41,12 +41,12 @@ contract SolvingDelegation is BasicDelegation {
     }
 
     function register(string memory name_, string memory symbol_) external onlyOneTime returns(IDelegateeToken) {
-        registration[msg.sender] = new SolvingDelegateeToken(name_, symbol_);
+        registration[msg.sender] = new DelegateeToken(name_, symbol_);
         _delegateeTokens.add(address(registration[msg.sender]));
         return registration[msg.sender];
     }
 
-    // @notice It's neccussary to give token's owner role equals to SolvingDelegation contract via `ownerTransfership`
+    // @notice It's neccussary to give token's owner role equals to RewardableDelegation contract via `ownerTransfership`
     function register(IDelegateeToken token) external onlyOneTime {
         if (_delegateeTokens.contains(address(token))) revert AnotherDelegateeToken();
         registration[msg.sender] = token;
