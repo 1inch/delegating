@@ -46,7 +46,7 @@ contract RewardableDelegation is BasicDelegation {
         _delegateeTokens.add(address(token));
     }
 
-    // @notice It's neccussary to give token's owner role equals to RewardableDelegation contract via `ownerTransfership`
+    /// @dev owner of IDelegateeToken should be set to this contract
     function register(IDelegateeToken token) external onlyOneTime {
         if (_delegateeTokens.contains(address(token))) revert AnotherDelegateeToken();
         registration[msg.sender] = token;
