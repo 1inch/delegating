@@ -4,4 +4,6 @@
 </div>
 
 # Delegating contracts
-...
+
+[![Build Status](https://github.com/1inch/delegating/workflows/CI/badge.svg)](https://github.com/1inch/delegating/actions)
+[![Coverage Status](https://codecov.io/gh/1inch/delegating/branch/master/graph/badge.svg?token=FSFTJPS41S)](https://codecov.io/gh/1inch/delegating)
