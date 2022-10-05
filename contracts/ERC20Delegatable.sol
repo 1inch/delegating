@@ -39,7 +39,7 @@ abstract contract ERC20Delegatable is ERC20, IERC20Delegatable {
         return _userDelegations[account].at(index);
     }
 
-    function userDelegations(address account) public view virtual returns(address[] memory) {
+    function userDelegations(address account) external view returns(address[] memory) {
         return _userDelegations[account].items.get();
     }
 
