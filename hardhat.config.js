@@ -2,20 +2,13 @@ require('@nomiclabs/hardhat-ethers');
 require('@nomiclabs/hardhat-etherscan');
 require('@nomiclabs/hardhat-truffle5');
 require('dotenv').config();
-require('hardhat-dependency-compiler');
 require('hardhat-deploy');
 require('hardhat-gas-reporter');
 require('solidity-coverage');
 
-const networks = require('./hardhat.networks');
+const { networks, etherscan } = require('./hardhat.networks');
 
 module.exports = {
-    etherscan: {
-        apiKey: {
-            mainnet: process.env.MAINNET_ETHERSCAN_KEY,
-            avalanche: process.env.AVAX_ETHERSCAN_KEY,
-        },
-    },
     solidity: {
         version: '0.8.17',
         settings: {
@@ -26,6 +19,7 @@ module.exports = {
         },
     },
     networks,
+    etherscan,
     namedAccounts: {
         deployer: {
             default: 0,
