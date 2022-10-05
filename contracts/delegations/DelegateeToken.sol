@@ -16,7 +16,7 @@ contract DelegateeToken is IDelegateeToken, ERC20Farmable, Ownable {
         string memory name,
         string memory symbol,
         uint256 maxUserFarms
-    ) ERC20(name, symbol) ERC20Farmable(maxUserFarms) {}
+    ) ERC20(name, symbol) ERC20Farmable(maxUserFarms) {} // solhint-disable-line no-empty-blocks
 
     function mint(address account, uint256 amount) external onlyOwner {
         _mint(account, amount);

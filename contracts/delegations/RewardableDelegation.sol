@@ -22,7 +22,7 @@ contract RewardableDelegation is BasicDelegation {
         _;
     }
 
-    constructor(string memory name_, string memory symbol_) BasicDelegation(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_) BasicDelegation(name_, symbol_) {} // solhint-disable-line no-empty-blocks
 
     function setDelegate(address account, address delegatee) public override {
         if (delegatee != address(0) && registration[delegatee] == IDelegateeToken(address(0))) revert NotRegisteredDelegatee();
@@ -33,10 +33,10 @@ contract RewardableDelegation is BasicDelegation {
         super.updateBalances(from, to, amount);
 
         if (to != address(0)) {
-            try registration[delegated[to]].mint{gas:200_000}(to, amount) {} catch {}
+            try registration[delegated[to]].mint{gas:200_000}(to, amount) {} catch {} // solhint-disable-line no-empty-blocks
         }
         if (from != address(0)) {
-            try registration[delegated[from]].burn{gas:200_000}(from, amount) {} catch {}
+            try registration[delegated[from]].burn{gas:200_000}(from, amount) {} catch {} // solhint-disable-line no-empty-blocks
         }
     }
 

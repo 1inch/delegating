@@ -13,7 +13,7 @@ contract BasicDelegation is IDelegation, ERC20, Ownable {
 
     mapping(address => address) public delegated;
 
-    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {} // solhint-disable-line no-empty-blocks
 
     function setDelegate(address account, address delegatee) public virtual onlyOwner {
         if (delegatee == address(0)) {
