@@ -17,7 +17,7 @@ contract RewardableDelegation is BasicDelegation {
     mapping(address => IDelegateeToken) public registration;
     AddressSet.Data private _delegateeTokens;
 
-    modifier onlyOneTime() {
+    modifier onlyNotRegistered() {
         if (address(registration[msg.sender]) != address(0)) revert AlreadyRegistered();
         _;
     }
@@ -40,14 +40,14 @@ contract RewardableDelegation is BasicDelegation {
         }
     }
 
-    function register(string memory name_, string memory symbol_) external onlyOneTime returns(IDelegateeToken token) {
+    function register(string memory name_, string memory symbol_) external onlyNotRegistered returns(IDelegateeToken token) {
         token = new DelegateeToken(name_, symbol_);
         registration[msg.sender] = token;
         _delegateeTokens.add(address(token));
     }
 
     /// @dev owner of IDelegateeToken should be set to this contract
-    function register(IDelegateeToken token) external onlyOneTime {
+    function register(IDelegateeToken token) external onlyNotRegistered {
         if (_delegateeTokens.contains(address(token))) revert AnotherDelegateeToken();
         registration[msg.sender] = token;
         _delegateeTokens.add(address(token));
