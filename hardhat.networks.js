@@ -1,7 +1,7 @@
 const networks = {};
 const etherscan = { apiKey: {} };
 
-function register(name, chainId, url, privateKey, etherscanNetworkName, etherscanKey) {
+function register (name, chainId, url, privateKey, etherscanNetworkName, etherscanKey) {
     if (url && privateKey && etherscanKey) {
         networks[name] = {
             url,
