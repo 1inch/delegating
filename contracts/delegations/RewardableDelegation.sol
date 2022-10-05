@@ -40,8 +40,8 @@ contract RewardableDelegation is BasicDelegation {
         }
     }
 
-    function register(string memory name_, string memory symbol_) external onlyNotRegistered returns(IDelegateeToken token) {
-        token = new DelegateeToken(name_, symbol_);
+    function register(string memory name, string memory symbol, uint256 maxUserFarms) external onlyNotRegistered returns(IDelegateeToken token) {
+        token = new DelegateeToken(name, symbol, maxUserFarms);
         registration[msg.sender] = token;
         _delegateeTokens.add(address(token));
     }

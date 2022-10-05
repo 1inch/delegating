@@ -65,7 +65,7 @@ describe('BasicDelegation', async () => {
     });
 
     describe('ERC20 overrides', async () => {
-        it('should not transfert', async () => {
+        it('should not transfer', async () => {
             await expect(this.basicDelegation.transfer(addr2, ether('1')))
                 .to.eventually.be.rejectedWith('MethodDisabled()');
         });
