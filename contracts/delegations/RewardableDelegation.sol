@@ -48,8 +48,7 @@ contract RewardableDelegation is BasicDelegation {
 
     /// @dev owner of IDelegateeToken should be set to this contract
     function register(IDelegateeToken token) external onlyNotRegistered {
-        if (_delegateeTokens.contains(address(token))) revert AnotherDelegateeToken();
+        if (!_delegateeTokens.add(address(token))) revert AnotherDelegateeToken();
         registration[msg.sender] = token;
-        _delegateeTokens.add(address(token));
     }
 }
