@@ -40,10 +40,10 @@ contract RewardableDelegation is BasicDelegation {
         }
     }
 
-    function register(string memory name_, string memory symbol_) external onlyOneTime returns(IDelegateeToken) {
-        registration[msg.sender] = new DelegateeToken(name_, symbol_);
-        _delegateeTokens.add(address(registration[msg.sender]));
-        return registration[msg.sender];
+    function register(string memory name_, string memory symbol_) external onlyOneTime returns(IDelegateeToken token) {
+        token = new DelegateeToken(name_, symbol_);
+        registration[msg.sender] = token;
+        _delegateeTokens.add(address(token));
     }
 
     // @notice It's neccussary to give token's owner role equals to RewardableDelegation contract via `ownerTransfership`
