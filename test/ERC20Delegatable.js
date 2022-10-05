@@ -225,6 +225,36 @@ describe('ERC20Delegatable', async () => {
             await expect(this.erc20delegatable.undelegate(this.delegation.address))
                 .to.eventually.be.rejectedWith('DelegationNotExist()');
         });
+
+        describe('should not revert when delegation contract methods', async () => {
+            beforeEach(async () => {
+                await this.erc20delegatable.delegate(this.wrongDelegation.address, delegatee);
+            });
+
+            it('reverting at setDelegate', async () => {
+                await this.wrongDelegation.setMethodReverting('setDelegate', true);
+                await this.erc20delegatable.undelegate(this.wrongDelegation.address);
+                expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(false);
+            });
+
+            it('has OutOfGas at setDelegate', async () => {
+                await this.wrongDelegation.setMethodOutOfGas('setDelegate', true);
+                await this.erc20delegatable.undelegate(this.wrongDelegation.address);
+                expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(false);
+            });
+
+            it('reverting at updateBalances', async () => {
+                await this.wrongDelegation.setMethodReverting('updateBalances', true);
+                await this.erc20delegatable.undelegate(this.wrongDelegation.address);
+                expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(false);
+            });
+
+            it('has OutOfGas at updateBalances', async () => {
+                await this.wrongDelegation.setMethodOutOfGas('updateBalances', true);
+                await this.erc20delegatable.undelegate(this.wrongDelegation.address);
+                expect(await this.erc20delegatable.userIsDelegating(addr1, this.wrongDelegation.address)).to.be.equals(false);
+            });
+        });
     });
 
     describe('undelegateAll', async () => {
