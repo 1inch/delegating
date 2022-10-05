@@ -35,9 +35,4 @@ module.exports = {
         enable: true,
         currency: 'USD',
     },
-    dependencyCompiler: {
-        paths: [
-            '@1inch/solidity-utils/contracts/mocks/TokenMock.sol',
-        ],
-    },
 };
