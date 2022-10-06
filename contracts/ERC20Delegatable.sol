@@ -17,6 +17,8 @@ abstract contract ERC20Delegatable is ERC20, IERC20Delegatable {
     error SameDelegateeAssigned();
     error DelegationNotExist();
 
+    uint256 private constant _DELEGATE_CALL_GAS_LIMIT = 200_000;
+
     uint256 public immutable maxUserDelegations;
 
     mapping(address => AddressSet.Data) private _userDelegations;
@@ -37,32 +39,31 @@ abstract contract ERC20Delegatable is ERC20, IERC20Delegatable {
         return _userDelegations[account].at(index);
     }
 
-    function userDelegations(address account) public view virtual returns(address[] memory) {
+    function userDelegations(address account) external view returns(address[] memory) {
         return _userDelegations[account].items.get();
     }
 
     function delegate(IDelegation delegation, address delegatee) external {
-        _userDelegations[msg.sender].add(address(delegation));
-        if (_userDelegations[msg.sender].length() > maxUserDelegations) revert MaxUserDelegationsReached();
         if (address(delegation) == address(0)) revert ZeroDelegationAddress();
-
-        address prevDelegatee;
-        try delegation.delegated{gas:200_000}(msg.sender) returns(address prevDelegatee_) {
-            prevDelegatee = prevDelegatee_;
-        } catch {}
-        if (prevDelegatee == delegatee) revert SameDelegateeAssigned();
-        if (prevDelegatee != address(0)) {
-            try delegation.updateBalances{gas:200_000}(msg.sender, address(0), balanceOf(msg.sender)) {} catch {}
+        if (_userDelegations[msg.sender].add(address(delegation))) {
+            if (_userDelegations[msg.sender].length() > maxUserDelegations) revert MaxUserDelegationsReached();
         }
 
-        try delegation.setDelegate{gas:200_000}(msg.sender, delegatee) {} catch {}
-        try delegation.updateBalances{gas:200_000}(address(0), msg.sender, balanceOf(msg.sender)) {} catch {}
+        uint256 balance = balanceOf(msg.sender);
+        address prevDelegatee = delegation.delegated(msg.sender);
+        if (prevDelegatee == delegatee) revert SameDelegateeAssigned();
+
+        if (prevDelegatee != address(0)) {
+            delegation.updateBalances(msg.sender, address(0), balance);
+        }
+        delegation.setDelegate(msg.sender, delegatee);
+        delegation.updateBalances(address(0), msg.sender, balance);
     }
 
     function undelegate(IDelegation delegation) public {
         if (!_userDelegations[msg.sender].remove(address(delegation))) revert DelegationNotExist();
-        try delegation.updateBalances{gas:200_000}(msg.sender, address(0), balanceOf(msg.sender)) {} catch {}
-        try delegation.setDelegate{gas:200_000}(msg.sender, address(0)) {} catch {}
+        try delegation.updateBalances{gas: _DELEGATE_CALL_GAS_LIMIT}(msg.sender, address(0), balanceOf(msg.sender)) {} catch {} // solhint-disable-line no-empty-blocks
+        try delegation.setDelegate{gas: _DELEGATE_CALL_GAS_LIMIT}(msg.sender, address(0)) {} catch {} // solhint-disable-line no-empty-blocks
     }
 
     function undelegateAll() external {
@@ -90,7 +91,7 @@ abstract contract ERC20Delegatable is ERC20, IERC20Delegatable {
                 for (j = 0; j < b.length; j++) {
                     if (delegation == b[j]) {
                         // Both parties are participating the same delegation
-                        try IDelegation(delegation).updateBalances{gas:200_000}(from, to, amount) {} catch {}
+                        try IDelegation(delegation).updateBalances{gas: _DELEGATE_CALL_GAS_LIMIT}(from, to, amount) {} catch {} // solhint-disable-line no-empty-blocks
                         b[j] = address(0);
                         break;
                     }
@@ -98,7 +99,7 @@ abstract contract ERC20Delegatable is ERC20, IERC20Delegatable {
 
                 if (j == b.length) {
                     // Sender is participating a delegation, but receiver is not
-                    try IDelegation(delegation).updateBalances{gas:200_000}(from, address(0), amount) {} catch {}
+                    try IDelegation(delegation).updateBalances{gas: _DELEGATE_CALL_GAS_LIMIT}(from, address(0), amount) {} catch {} // solhint-disable-line no-empty-blocks
                 }
             }
 
@@ -106,7 +107,7 @@ abstract contract ERC20Delegatable is ERC20, IERC20Delegatable {
                 address delegation = b[j];
                 if (delegation != address(0)) {
                     // Receiver is participating a delegation, but sender is not
-                    try IDelegation(delegation).updateBalances{gas:200_000}(address(0), to, amount) {} catch {}
+                    try IDelegation(delegation).updateBalances{gas: _DELEGATE_CALL_GAS_LIMIT}(address(0), to, amount) {} catch {} // solhint-disable-line no-empty-blocks
                 }
             }
         }

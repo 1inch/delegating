@@ -7,13 +7,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "../interfaces/IDelegation.sol";
 
-// @notice It should neccussary to give owner role equals to ERC20Delegatable contract via `ownerTransfership`
+/// @dev owner of BasicDelegation should be set to ERC20Delegatable contract
 contract BasicDelegation is IDelegation, ERC20, Ownable {
     error MethodDisabled();
 
     mapping(address => address) public delegated;
 
-    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {} // solhint-disable-line no-empty-blocks
 
     function setDelegate(address account, address delegatee) public virtual onlyOwner {
         if (delegatee == address(0)) {

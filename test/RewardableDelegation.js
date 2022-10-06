@@ -7,6 +7,7 @@ const DelegateeToken = artifacts.require('DelegateeToken');
 
 describe('RewardableDelegation', async () => {
     let addr1, addr2, delegatee, newDelegatee;
+    const maxFarm = 5;
 
     before(async () => {
         [addr1, addr2, delegatee, newDelegatee] = await web3.eth.getAccounts();
@@ -20,14 +21,14 @@ describe('RewardableDelegation', async () => {
         describe('register(string,string)', async () => {
             it('should registrate delegatee and create new token', async () => {
                 expect(await this.delegation.registration(delegatee)).to.be.equals(constants.ZERO_ADDRESS);
-                await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol').send({ from: delegatee });
+                await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
                 const delegateeToken = await hre.ethers.getContractAt('DelegateeToken', await this.delegation.registration(delegatee));
                 expect(await delegateeToken.name()).to.be.equals('TestTokenName');
                 expect(await delegateeToken.symbol()).to.be.equals('TestTokenSymbol');
             });
 
             it('should mint and burn DelegateeToken only ReawardableDelegation', async () => {
-                await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol').send({ from: delegatee });
+                await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
                 const delegateeToken = await hre.ethers.getContractAt('DelegateeToken', await this.delegation.registration(delegatee));
                 await expect(delegateeToken.mint(addr1, '1000'))
                     .to.eventually.be.rejectedWith('Ownable: caller is not the owner');
@@ -36,28 +37,28 @@ describe('RewardableDelegation', async () => {
             });
 
             it('should not double registrate', async () => {
-                await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol').send({ from: delegatee });
-                await expect(this.delegation.contract.methods.register('TestTokenName2', 'TestTokenSymbol2').send({ from: delegatee }))
+                await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
+                await expect(this.delegation.contract.methods.register('TestTokenName2', 'TestTokenSymbol2', maxFarm).send({ from: delegatee }))
                     .to.eventually.be.rejectedWith('AlreadyRegistered()');
             });
         });
 
         describe('register(IDelegateeToken)', async () => {
             it('should registrate delegatee', async () => {
-                const delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', { from: delegatee });
+                const delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', maxFarm, { from: delegatee });
                 await this.delegation.contract.methods.register(delegateeToken.address).send({ from: delegatee });
                 expect(await this.delegation.registration(delegatee)).to.be.equals(delegateeToken.address);
             });
 
             it('should not registrate with already used token', async () => {
-                await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol').send({ from: delegatee });
+                await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
                 const delegateeToken = await hre.ethers.getContractAt('DelegateeToken', await this.delegation.registration(delegatee));
                 await expect(this.delegation.contract.methods.register(delegateeToken.address).send({ from: newDelegatee }))
                     .to.eventually.be.rejectedWith('AnotherDelegateeToken()');
             });
 
             it('should not double registrate', async () => {
-                const delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', { from: delegatee });
+                const delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', maxFarm, { from: delegatee });
                 await this.delegation.contract.methods.register(delegateeToken.address).send({ from: delegatee });
                 await expect(this.delegation.contract.methods.register(delegateeToken.address).send({ from: delegatee }))
                     .to.eventually.be.rejectedWith('AlreadyRegistered()');
@@ -67,7 +68,7 @@ describe('RewardableDelegation', async () => {
 
     describe('setDelegate', async () => {
         beforeEach(async () => {
-            await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol').send({ from: delegatee });
+            await this.delegation.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
         });
 
         it('should set delegate and emit Delegate event', async () => {
@@ -95,11 +96,11 @@ describe('RewardableDelegation', async () => {
 
     describe('updateBalances', async () => {
         beforeEach(async () => {
-            this.delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', { from: delegatee });
+            this.delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', maxFarm, { from: delegatee });
             await this.delegation.contract.methods.register(this.delegateeToken.address).send({ from: delegatee });
             await this.delegateeToken.transferOwnership(this.delegation.address, { from: delegatee });
 
-            this.newDelegateeToken = await DelegateeToken.new('TestTokenName_2', 'TestTokenName_2', { from: newDelegatee });
+            this.newDelegateeToken = await DelegateeToken.new('TestTokenName_2', 'TestTokenName_2', maxFarm, { from: newDelegatee });
             await this.delegation.contract.methods.register(this.newDelegateeToken.address).send({ from: newDelegatee });
             await this.newDelegateeToken.transferOwnership(this.delegation.address, { from: newDelegatee });
 
