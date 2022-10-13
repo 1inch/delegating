@@ -13,6 +13,7 @@ contract WrongDelegation is IDelegationTopic, ERC20, Ownable {
     mapping(string => bool) public isRevert;
     mapping(string => bool) public isOutOfGas;
 
+    // solhint-disable-next-line no-empty-blocks
     constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {}
 
     function delegated(address /* account */) external view returns(address) {

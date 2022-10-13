@@ -7,7 +7,8 @@ import "../ERC20Delegatable.sol";
 
 contract ERC20DelegatableMock is ERC20Delegatable, Ownable {
     constructor(string memory name, string memory symbol, uint256 maxUserFarms)
-        ERC20Delegatable(maxUserFarms) ERC20(name, symbol) {}
+        ERC20Delegatable(maxUserFarms) ERC20(name, symbol)
+    {}  // solhint-disable-line no-empty-blocks
 
     function mint(address account, uint256 amount) external onlyOwner {
         _mint(account, amount);

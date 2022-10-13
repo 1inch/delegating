@@ -22,7 +22,8 @@ contract RewardableDelegationTopic is BasicDelegationTopic {
         _;
     }
 
-    constructor(string memory name_, string memory symbol_) BasicDelegationTopic(name_, symbol_) {} // solhint-disable-line no-empty-blocks
+    // solhint-disable-next-line no-empty-blocks
+    constructor(string memory name_, string memory symbol_) BasicDelegationTopic(name_, symbol_) {}
 
     function setDelegate(address account, address delegatee) public override {
         if (delegatee != address(0) && registration[delegatee] == IDelegateeToken(address(0))) revert NotRegisteredDelegatee();
