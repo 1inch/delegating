@@ -5,10 +5,10 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import "../interfaces/IDelegation.sol";
+import "../interfaces/IDelegationTopic.sol";
 
-/// @dev owner of BasicDelegation should be set to ERC20Delegatable contract
-contract BasicDelegation is IDelegation, ERC20, Ownable {
+/// @dev owner of BasicDelegationTopic should be set to ERC20Delegatable contract
+contract BasicDelegationTopic is IDelegationTopic, ERC20, Ownable {
     error MethodDisabled();
 
     mapping(address => address) public delegated;

@@ -3,11 +3,11 @@
 pragma solidity ^0.8.0;
 
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
-import "./BasicDelegation.sol";
+import "./BasicDelegationTopic.sol";
 import "./DelegateeToken.sol";
 import "../interfaces/IDelegateeToken.sol";
 
-contract RewardableDelegation is BasicDelegation {
+contract RewardableDelegationTopic is BasicDelegationTopic {
     using AddressSet for AddressSet.Data;
 
     error NotRegisteredDelegatee();
@@ -22,7 +22,7 @@ contract RewardableDelegation is BasicDelegation {
         _;
     }
 
-    constructor(string memory name_, string memory symbol_) BasicDelegation(name_, symbol_) {} // solhint-disable-line no-empty-blocks
+    constructor(string memory name_, string memory symbol_) BasicDelegationTopic(name_, symbol_) {} // solhint-disable-line no-empty-blocks
 
     function setDelegate(address account, address delegatee) public override {
         if (delegatee != address(0) && registration[delegatee] == IDelegateeToken(address(0))) revert NotRegisteredDelegatee();

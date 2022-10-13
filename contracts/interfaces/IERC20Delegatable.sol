@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./IDelegation.sol";
+import "./IDelegationTopic.sol";
 
 interface IERC20Delegatable is IERC20 {
     function userIsDelegating(address account, address delegation) external view returns(bool);
@@ -11,7 +11,7 @@ interface IERC20Delegatable is IERC20 {
     function userDelegationsAt(address account, uint256 index) external view returns(address);
     function userDelegations(address account) external view returns(address[] memory);
 
-    function delegate(IDelegation delegation, address delegat) external; // limit
-    function undelegate(IDelegation delegation) external;
+    function delegate(IDelegationTopic delegation, address delegat) external; // limit
+    function undelegate(IDelegationTopic delegation) external;
     function undelegateAll() external;
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-interface IDelegation is IERC20 {
+interface IDelegationTopic is IERC20 {
     event Delegate(address account, address delegatee);
     event Undelegate(address account, address delegatee);
 
