@@ -5,7 +5,9 @@
     "homepage": "https://github.com/1inch/delegating#readme",
     "author": "1inch",
     "files": [
-        "/contracts/**/*.sol"
+        "./contracts/delegations/*.sol",
+        "./contracts/interfaces/*.sol",
+        "./contracts/*.sol"
     ],
     "repository": {
         "type": "git",
