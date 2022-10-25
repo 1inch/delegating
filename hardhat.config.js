@@ -1,14 +1,16 @@
 require('@nomiclabs/hardhat-ethers');
 require('@nomiclabs/hardhat-etherscan');
 require('@nomicfoundation/hardhat-chai-matchers');
-require('dotenv').config();
+require('solidity-coverage');
+require('hardhat-dependency-compiler');
 require('hardhat-deploy');
 require('hardhat-gas-reporter');
-require('solidity-coverage');
+require('dotenv').config();
 
 const { networks, etherscan } = require('./hardhat.networks');
 
 module.exports = {
+    etherscan,
     solidity: {
         version: '0.8.17',
         settings: {
@@ -19,7 +21,6 @@ module.exports = {
         },
     },
     networks,
-    etherscan,
     namedAccounts: {
         deployer: {
             default: 0,

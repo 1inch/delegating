@@ -88,7 +88,7 @@ describe('RewardableDelegationTopic', async () => {
             const { delegationTopic } = await loadFixture(initContractsAndRegister);
             const tx = await delegationTopic.setDelegate(addr1.address, delegatee.address);
             const receipt = await tx.wait();
-            expect(await delegationTopic.delegated(addr1.address)).to.equal(delegatee);
+            expect(await delegationTopic.delegated(addr1.address)).to.equal(delegatee.address);
             expect(receipt.events[0].event).to.equal('Delegate');
         });
 
