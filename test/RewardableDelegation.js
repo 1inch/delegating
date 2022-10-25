@@ -1,136 +1,162 @@
 const { constants, expect, ether } = require('@1inch/solidity-utils');
-const hre = require('hardhat');
-const { artifacts } = hre;
-
-const RewardableDelegationTopic = artifacts.require('RewardableDelegationTopic');
-const DelegateeToken = artifacts.require('DelegateeToken');
+const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
+const { ethers } = require('hardhat');
+const { BigNumber: BN } = require('ethers');
 
 describe('RewardableDelegationTopic', async () => {
     let addr1, addr2, delegatee, newDelegatee;
-    const maxFarm = 5;
+    let RewardableDelegationTopic;
+    let DelegateeToken;
+    const MAX_FARM = 5;
 
     before(async () => {
-        [addr1, addr2, delegatee, newDelegatee] = await web3.eth.getAccounts();
+        [addr1, addr2, delegatee, newDelegatee] = await ethers.getSigners();
+        RewardableDelegationTopic = await ethers.getContractFactory('RewardableDelegationTopic');
+        DelegateeToken = await ethers.getContractFactory('DelegateeToken');
     });
 
-    beforeEach(async () => {
-        this.delegationTopic = await RewardableDelegationTopic.new('Rewardable', 'RWD');
-    });
+    async function initContracts () {
+        const delegationTopic = await RewardableDelegationTopic.deploy('Rewardable', 'RWD');
+        await delegationTopic.deployed();
+        return { delegationTopic };
+    };
 
     describe('register', async () => {
         describe('register(string,string)', async () => {
             it('should registrate delegatee and create new token', async () => {
-                expect(await this.delegationTopic.registration(delegatee)).to.be.equals(constants.ZERO_ADDRESS);
-                await this.delegationTopic.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
-                const delegateeToken = await hre.ethers.getContractAt('DelegateeToken', await this.delegationTopic.registration(delegatee));
-                expect(await delegateeToken.name()).to.be.equals('TestTokenName');
-                expect(await delegateeToken.symbol()).to.be.equals('TestTokenSymbol');
+                const { delegationTopic } = await loadFixture(initContracts);
+                expect(await delegationTopic.registration(delegatee.address)).to.equal(constants.ZERO_ADDRESS);
+                await delegationTopic.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                const delegateeToken = await ethers.getContractAt('DelegateeToken', await delegationTopic.registration(delegatee.address));
+                expect(await delegateeToken.name()).to.equal('TestTokenName');
+                expect(await delegateeToken.symbol()).to.equal('TestTokenSymbol');
             });
 
             it('should mint and burn DelegateeToken only ReawardableDelegation', async () => {
-                await this.delegationTopic.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
-                const delegateeToken = await hre.ethers.getContractAt('DelegateeToken', await this.delegationTopic.registration(delegatee));
-                await expect(delegateeToken.mint(addr1, '1000'))
-                    .to.eventually.be.rejectedWith('Ownable: caller is not the owner');
-                await expect(delegateeToken.burn(addr1, '1000'))
-                    .to.eventually.be.rejectedWith('Ownable: caller is not the owner');
+                const { delegationTopic } = await loadFixture(initContracts);
+                await delegationTopic.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                const delegateeToken = await ethers.getContractAt('DelegateeToken', await delegationTopic.registration(delegatee.address));
+                await expect(delegateeToken.mint(addr1.address, '1000'))
+                    .to.be.revertedWith('Ownable: caller is not the owner');
+                await expect(delegateeToken.burn(addr1.address, '1000'))
+                    .to.be.revertedWith('Ownable: caller is not the owner');
             });
 
             it('should not double registrate', async () => {
-                await this.delegationTopic.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
-                await expect(this.delegationTopic.contract.methods.register('TestTokenName2', 'TestTokenSymbol2', maxFarm).send({ from: delegatee }))
-                    .to.eventually.be.rejectedWith('AlreadyRegistered()');
+                const { delegationTopic } = await loadFixture(initContracts);
+                await delegationTopic.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                await expect(delegationTopic.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName2', 'TestTokenSymbol2', MAX_FARM))
+                    .to.be.revertedWithCustomError(delegationTopic, 'AlreadyRegistered');
             });
         });
 
         describe('register(IDelegateeToken)', async () => {
             it('should registrate delegatee', async () => {
-                const delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', maxFarm, { from: delegatee });
-                await this.delegationTopic.contract.methods.register(delegateeToken.address).send({ from: delegatee });
-                expect(await this.delegationTopic.registration(delegatee)).to.be.equals(delegateeToken.address);
+                const { delegationTopic } = await loadFixture(initContracts);
+                const delegateeToken = await DelegateeToken.connect(delegatee).deploy('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                await delegateeToken.deployed();
+                await delegationTopic.connect(delegatee).functions['register(address)'](delegateeToken.address);
+                expect(await delegationTopic.registration(delegatee.address)).to.equal(delegateeToken.address);
             });
 
             it('should not registrate with already used token', async () => {
-                await this.delegationTopic.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
-                const delegateeToken = await hre.ethers.getContractAt('DelegateeToken', await this.delegationTopic.registration(delegatee));
-                await expect(this.delegationTopic.contract.methods.register(delegateeToken.address).send({ from: newDelegatee }))
-                    .to.eventually.be.rejectedWith('AnotherDelegateeToken()');
+                const { delegationTopic } = await loadFixture(initContracts);
+                await delegationTopic.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                const delegateeToken = await ethers.getContractAt('DelegateeToken', await delegationTopic.registration(delegatee.address));
+                await expect(delegationTopic.connect(newDelegatee).functions['register(address)'](delegateeToken.address))
+                    .to.be.revertedWithCustomError(delegationTopic, 'AnotherDelegateeToken');
             });
 
             it('should not double registrate', async () => {
-                const delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', maxFarm, { from: delegatee });
-                await this.delegationTopic.contract.methods.register(delegateeToken.address).send({ from: delegatee });
-                await expect(this.delegationTopic.contract.methods.register(delegateeToken.address).send({ from: delegatee }))
-                    .to.eventually.be.rejectedWith('AlreadyRegistered()');
+                const { delegationTopic } = await loadFixture(initContracts);
+                const delegateeToken = await DelegateeToken.connect(delegatee).deploy('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                await delegationTopic.connect(delegatee).functions['register(address)'](delegateeToken.address);
+                await expect(delegationTopic.connect(delegatee).functions['register(address)'](delegateeToken.address))
+                    .to.be.revertedWithCustomError(delegationTopic, 'AlreadyRegistered');
             });
         });
     });
 
     describe('setDelegate', async () => {
-        beforeEach(async () => {
-            await this.delegationTopic.contract.methods.register('TestTokenName', 'TestTokenSymbol', maxFarm).send({ from: delegatee });
-        });
+        async function initContractsAndRegister () {
+            const { delegationTopic } = await initContracts();
+            await delegationTopic.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+            return { delegationTopic };
+        };
 
         it('should set delegate and emit Delegate event', async () => {
-            const tx = await this.delegationTopic.setDelegate(addr1, delegatee);
-            expect(await this.delegationTopic.delegated(addr1)).to.be.equals(delegatee);
-            expect(tx.logs[0].event).to.be.equals('Delegate');
+            const { delegationTopic } = await loadFixture(initContractsAndRegister);
+            const tx = await delegationTopic.setDelegate(addr1.address, delegatee.address);
+            const receipt = await tx.wait();
+            expect(await delegationTopic.delegated(addr1.address)).to.equal(delegatee);
+            expect(receipt.events[0].event).to.equal('Delegate');
         });
 
         it('should set delegate and emit Undelegate event', async () => {
-            const tx = await this.delegationTopic.setDelegate(addr1, constants.ZERO_ADDRESS);
-            expect(await this.delegationTopic.delegated(addr1)).to.be.equals(constants.ZERO_ADDRESS);
-            expect(tx.logs[0].event).to.be.equals('Undelegate');
+            const { delegationTopic } = await loadFixture(initContractsAndRegister);
+            const tx = await delegationTopic.setDelegate(addr1.address, constants.ZERO_ADDRESS);
+            const receipt = await tx.wait();
+            expect(await delegationTopic.delegated(addr1.address)).to.equal(constants.ZERO_ADDRESS);
+            expect(receipt.events[0].event).to.equal('Undelegate');
         });
 
         it('should delegate by only owner', async () => {
-            await expect(this.delegationTopic.setDelegate(addr1, delegatee, { from: addr2 }))
-                .to.eventually.be.rejectedWith('Ownable: caller is not the owner');
+            const { delegationTopic } = await loadFixture(initContractsAndRegister);
+            await expect(delegationTopic.connect(addr2).setDelegate(addr1.address, delegatee.address))
+                .to.be.revertedWith('Ownable: caller is not the owner');
         });
 
         it('should not delegate not registered delegatee', async () => {
-            await expect(this.delegationTopic.setDelegate(addr1, newDelegatee))
-                .to.eventually.be.rejectedWith('NotRegisteredDelegatee()');
+            const { delegationTopic } = await loadFixture(initContractsAndRegister);
+            await expect(delegationTopic.setDelegate(addr1.address, newDelegatee.address))
+                .to.be.revertedWithCustomError(delegationTopic, 'NotRegisteredDelegatee');
         });
     });
 
     describe('updateBalances', async () => {
-        beforeEach(async () => {
-            this.delegateeToken = await DelegateeToken.new('TestTokenName', 'TestTokenSymbol', maxFarm, { from: delegatee });
-            await this.delegationTopic.contract.methods.register(this.delegateeToken.address).send({ from: delegatee });
-            await this.delegateeToken.transferOwnership(this.delegationTopic.address, { from: delegatee });
+        async function initContractsAndTokens () {
+            const { delegationTopic } = await initContracts();
+            const delegateeToken = await DelegateeToken.connect(delegatee).deploy('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+            await delegateeToken.deployed();
+            await delegationTopic.connect(delegatee).functions['register(address)'](delegateeToken.address);
+            await delegateeToken.connect(delegatee).transferOwnership(delegationTopic.address);
 
-            this.newDelegateeToken = await DelegateeToken.new('TestTokenName_2', 'TestTokenName_2', maxFarm, { from: newDelegatee });
-            await this.delegationTopic.contract.methods.register(this.newDelegateeToken.address).send({ from: newDelegatee });
-            await this.newDelegateeToken.transferOwnership(this.delegationTopic.address, { from: newDelegatee });
+            const newDelegateeToken = await DelegateeToken.connect(newDelegatee).deploy('TestTokenName_2', 'TestTokenName_2', MAX_FARM);
+            await newDelegateeToken.deployed();
+            await delegationTopic.connect(newDelegatee).functions['register(address)'](newDelegateeToken.address);
+            await newDelegateeToken.connect(newDelegatee).transferOwnership(delegationTopic.address);
 
-            await this.delegationTopic.setDelegate(addr1, delegatee);
-            await this.delegationTopic.setDelegate(addr2, newDelegatee);
+            await delegationTopic.setDelegate(addr1.address, delegatee.address);
+            await delegationTopic.setDelegate(addr2.address, newDelegatee.address);
 
-            this.amount = ether('1');
-        });
+            const amount = BN.from(ether('1'));
+            return { delegationTopic, delegateeToken, newDelegateeToken, amount };
+        };
 
         it('`address(0) -> addr1` should mint DelegateeToken for addr1', async () => {
-            const balanceBefore = await this.delegateeToken.balanceOf(addr1);
-            await this.delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1, this.amount);
-            expect(await this.delegateeToken.balanceOf(addr1)).to.be.bignumber.eq(balanceBefore.add(this.amount));
+            const { delegationTopic, delegateeToken, amount } = await loadFixture(initContractsAndTokens);
+            const balanceBefore = await delegateeToken.balanceOf(addr1.address);
+            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1.address, amount);
+            expect(await delegateeToken.balanceOf(addr1.address)).to.equal(balanceBefore.add(amount));
         });
 
         it('`addr1 -> address(0)` should burn DelegateeToken for addr1', async () => {
-            await this.delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1, this.amount.muln(5));
-            const balanceBefore = await this.delegateeToken.balanceOf(addr1);
-            await this.delegationTopic.updateBalances(addr1, constants.ZERO_ADDRESS, this.amount);
-            expect(await this.delegateeToken.balanceOf(addr1)).to.be.bignumber.eq(balanceBefore.sub(this.amount));
+            const { delegationTopic, delegateeToken, amount } = await loadFixture(initContractsAndTokens);
+            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1.address, amount.mul(5));
+            const balanceBefore = await delegateeToken.balanceOf(addr1.address);
+            await delegationTopic.updateBalances(addr1.address, constants.ZERO_ADDRESS, amount);
+            expect(await delegateeToken.balanceOf(addr1.address)).to.equal(balanceBefore.sub(amount));
         });
 
         it('`addr1 -> addr2` should change their DelegateeToken balances', async () => {
-            await this.delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1, this.amount.muln(10));
-            await this.delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr2, this.amount.muln(20));
-            const balanceBeforeDelegatee = await this.delegationTopic.balanceOf(delegatee);
-            const balanceBeforeNewDelegatee = await this.delegationTopic.balanceOf(newDelegatee);
-            await this.delegationTopic.updateBalances(addr1, addr2, this.amount);
-            expect(await this.delegationTopic.balanceOf(delegatee)).to.be.bignumber.eq(balanceBeforeDelegatee.sub(this.amount));
-            expect(await this.delegationTopic.balanceOf(newDelegatee)).to.be.bignumber.eq(balanceBeforeNewDelegatee.add(this.amount));
+            const { delegationTopic, amount } = await loadFixture(initContractsAndTokens);
+            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1.address, amount.mul(10));
+            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr2.address, amount.mul(20));
+            const balanceBeforeDelegatee = await delegationTopic.balanceOf(delegatee.address);
+            const balanceBeforeNewDelegatee = await delegationTopic.balanceOf(newDelegatee.address);
+            await delegationTopic.updateBalances(addr1.address, addr2.address, amount);
+            expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(balanceBeforeDelegatee.sub(amount));
+            expect(await delegationTopic.balanceOf(newDelegatee.address)).to.equal(balanceBeforeNewDelegatee.add(amount));
         });
     });
 });
