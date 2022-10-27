@@ -6,16 +6,17 @@ const MAX_USER_DELEGATIONS = 7;
 
 describe('ERC20Delegatable', function () {
     let addr1, addr2, addr3, delegatee, newDelegatee;
+    let BasicDelegationTopic;
 
     before(async function () {
         [addr1, addr2, addr3, delegatee, newDelegatee] = await ethers.getSigners();
+        BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
     });
 
     async function initContracts () {
         const ERC20DelegatableMock = await ethers.getContractFactory('ERC20DelegatableMock');
         const erc20delegatable = await ERC20DelegatableMock.deploy('st1INCH', 'st1INCH', MAX_USER_DELEGATIONS);
         await erc20delegatable.deployed();
-        const BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
         const delegationTopic = await BasicDelegationTopic.deploy('DelegationContract', 'DC');
         await delegationTopic.deployed();
         await delegationTopic.transferOwnership(erc20delegatable.address);
@@ -26,7 +27,7 @@ describe('ERC20Delegatable', function () {
         return { erc20delegatable, delegationTopic, wrongDelegation };
     };
 
-    async function createDelegations(amount, erc20delegatable) {
+    async function createDelegations (amount, erc20delegatable) {
         const BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
         const delegations = [];
         for (let i = 0; i < amount; i++) {
@@ -37,7 +38,7 @@ describe('ERC20Delegatable', function () {
         return delegations;
     };
 
-    async function delegate(delegations, delegatee, delegator, erc20delegatable) {
+    async function delegate (delegations, delegatee, delegator, erc20delegatable) {
         for (const delegation of delegations) {
             await erc20delegatable.connect(delegator).delegate(delegation.address, delegatee.address);
         }
