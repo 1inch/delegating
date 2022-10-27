@@ -5,13 +5,13 @@ const { BigNumber: BN } = require('ethers');
 
 const MAX_USER_DELEGATIONS = 7;
 
-describe('ERC20Delegatable', async () => {
+describe('ERC20Delegatable', function () {
     let addr1, addr2, addr3, delegatee, newDelegatee;
     let BasicDelegationTopic;
     let ERC20DelegatableMock;
     let WrongDelegation;
 
-    before(async () => {
+    before(async function () {
         [addr1, addr2, addr3, delegatee, newDelegatee] = await ethers.getSigners();
         BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
         ERC20DelegatableMock = await ethers.getContractFactory('ERC20DelegatableMock');
@@ -46,19 +46,19 @@ describe('ERC20Delegatable', async () => {
         }
     };
 
-    describe('userIsDelegating', async () => {
-        it('should return true if account delegate', async () => {
+    describe('userIsDelegating', function () {
+        it('should return true if account delegate', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
             expect(await erc20delegatable.userIsDelegating(addr1.address, delegationTopic.address)).to.equal(true);
         });
 
-        it('should return false if account doesn\'t delegate', async () => {
+        it('should return false if account doesn\'t delegate', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             expect(await erc20delegatable.userIsDelegating(addr1.address, delegationTopic.address)).to.equal(false);
         });
 
-        it('should return false if account undelegate', async () => {
+        it('should return false if account undelegate', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
             await erc20delegatable.undelegate(delegationTopic.address);
@@ -66,14 +66,14 @@ describe('ERC20Delegatable', async () => {
         });
     });
 
-    describe('userDelegationsCount', async () => {
+    describe('userDelegationsCount', function () {
         async function initContractsAndDelegation () {
             const { erc20delegatable, delegationTopic, wrongDelegation } = await initContracts();
             const delegations = await createDelegations(erc20delegatable, MAX_USER_DELEGATIONS);
             return { erc20delegatable, delegationTopic, wrongDelegation, delegations };
         };
 
-        it('should increase after delegate', async () => {
+        it('should increase after delegate', async function () {
             const { erc20delegatable, delegations } = await loadFixture(initContractsAndDelegation);
             let delegationsCount = await erc20delegatable.userDelegationsCount(addr1.address);
             for (const delegation of delegations) {
@@ -83,7 +83,7 @@ describe('ERC20Delegatable', async () => {
             }
         });
 
-        it('should decrease after undelegate', async () => {
+        it('should decrease after undelegate', async function () {
             const { erc20delegatable, delegations } = await loadFixture(initContractsAndDelegation);
             await delegate(delegations, delegatee, addr1, erc20delegatable);
             let delegationsCount = await erc20delegatable.userDelegationsCount(addr1.address);
@@ -94,7 +94,7 @@ describe('ERC20Delegatable', async () => {
             }
         });
 
-        it('should not change after redelegate', async () => {
+        it('should not change after redelegate', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContractsAndDelegation);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
             const delegationsCount = await erc20delegatable.userDelegationsCount(addr1.address);
@@ -103,8 +103,8 @@ describe('ERC20Delegatable', async () => {
         });
     });
 
-    describe('userDelegationsAt', async () => {
-        it('should return delegations', async () => {
+    describe('userDelegationsAt', function () {
+        it('should return delegations', async function () {
             const { erc20delegatable } = await loadFixture(initContracts);
             const delegations = await createDelegations(MAX_USER_DELEGATIONS, erc20delegatable);
             await delegate(delegations, delegatee, addr1, erc20delegatable);
@@ -115,8 +115,8 @@ describe('ERC20Delegatable', async () => {
         });
     });
 
-    describe('userDelegations', async () => {
-        it('should return delegations', async () => {
+    describe('userDelegations', function () {
+        it('should return delegations', async function () {
             const { erc20delegatable } = await loadFixture(initContracts);
             const delegations = await createDelegations(MAX_USER_DELEGATIONS, erc20delegatable);
             await delegate(delegations, delegatee, addr1, erc20delegatable);
@@ -124,15 +124,15 @@ describe('ERC20Delegatable', async () => {
         });
     });
 
-    describe('delegate', async () => {
-        it('should delegate', async () => {
+    describe('delegate', function () {
+        it('should delegate', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
             expect(await erc20delegatable.userIsDelegating(addr1.address, delegationTopic.address)).to.equal(true);
             expect(await delegationTopic.delegated(addr1.address)).to.equal(delegatee.address);
         });
 
-        it('should not delegate more than MAX_USER_DELEGATIONS', async () => {
+        it('should not delegate more than MAX_USER_DELEGATIONS', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             for (let i = 0; i < MAX_USER_DELEGATIONS; i++) {
                 const delegation = await BasicDelegationTopic.deploy(`DelegationContract${i}`, `DC${i}`);
@@ -144,14 +144,14 @@ describe('ERC20Delegatable', async () => {
                 .to.be.revertedWithCustomError(erc20delegatable, 'MaxUserDelegationsReached');
         });
 
-        it('should redelegate', async () => {
+        it('should redelegate', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
             await erc20delegatable.delegate(delegationTopic.address, newDelegatee.address);
             expect(await delegationTopic.delegated(addr1.address)).to.equal(newDelegatee.address);
         });
 
-        it('should redelegate when MAX_USER_DELEGATIONS reached', async () => {
+        it('should redelegate when MAX_USER_DELEGATIONS reached', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
             for (let i = 1; i < MAX_USER_DELEGATIONS; i++) {
@@ -164,20 +164,20 @@ describe('ERC20Delegatable', async () => {
             expect(await delegationTopic.delegated(addr1.address)).to.equal(newDelegatee.address);
         });
 
-        it('should not delegate to delegation zero-address', async () => {
+        it('should not delegate to delegation zero-address', async function () {
             const { erc20delegatable } = await loadFixture(initContracts);
             await expect(erc20delegatable.delegate(constants.ZERO_ADDRESS, delegatee.address))
                 .to.be.revertedWithCustomError(erc20delegatable, 'ZeroDelegationAddress');
         });
 
-        it('should not delegate to the same delegatee', async () => {
+        it('should not delegate to the same delegatee', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
             await expect(erc20delegatable.delegate(delegationTopic.address, delegatee.address))
                 .to.be.revertedWithCustomError(erc20delegatable, 'SameDelegateeAssigned');
         });
 
-        it('should increase delegatee\'s balance in delegation contract', async () => {
+        it('should increase delegatee\'s balance in delegation contract', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             const amount = BN.from(ether('1'));
             await erc20delegatable.mint(addr1.address, amount);
@@ -187,7 +187,7 @@ describe('ERC20Delegatable', async () => {
             expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(amount);
         });
 
-        it('should decrease delegatee\'s balance in delegation contract after redelegation to another delegatee', async () => {
+        it('should decrease delegatee\'s balance in delegation contract after redelegation to another delegatee', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             const amount = BN.from(ether('1'));
             await erc20delegatable.mint(addr1.address, amount);
@@ -202,7 +202,7 @@ describe('ERC20Delegatable', async () => {
             expect(await delegationTopic.balanceOf(newDelegatee.address)).to.equal(amount);
         });
 
-        it('should increase delegatee\'s balance in delegation contract after increasing delegator balance', async () => {
+        it('should increase delegatee\'s balance in delegation contract after increasing delegator balance', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             const amount = BN.from(ether('1'));
             const additionalAmount = BN.from(ether('0.5'));
@@ -214,7 +214,7 @@ describe('ERC20Delegatable', async () => {
             expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(amount.add(additionalAmount));
         });
 
-        it('should decrease delegatee\'s balance in delegation contract after decreasing delegator balance', async () => {
+        it('should decrease delegatee\'s balance in delegation contract after decreasing delegator balance', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
             const amount = BN.from(ether('1'));
             const additionalAmount = BN.from(ether('0.5'));
@@ -227,7 +227,7 @@ describe('ERC20Delegatable', async () => {
         });
     });
 
-    describe('undelegate', async () => {
+    describe('undelegate', function () {
         async function initContractsAndDelegate () {
             const { erc20delegatable, delegationTopic, wrongDelegation } = await initContracts();
             const amount = BN.from(ether('1'));
@@ -236,14 +236,14 @@ describe('ERC20Delegatable', async () => {
             return { erc20delegatable, delegationTopic, wrongDelegation };
         };
 
-        it('should undelegate', async () => {
+        it('should undelegate', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContractsAndDelegate);
             await erc20delegatable.undelegate(delegationTopic.address);
             expect(await erc20delegatable.userIsDelegating(addr1.address, delegationTopic.address)).to.equal(false);
             expect(await delegationTopic.delegated(addr1.address)).to.equal(constants.ZERO_ADDRESS);
         });
 
-        it('should decrease delegatee\'s balance in delegation contract', async () => {
+        it('should decrease delegatee\'s balance in delegation contract', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContractsAndDelegate);
             const balanceBefore = await delegationTopic.balanceOf(delegatee.address);
             const delegatorBalance = await erc20delegatable.balanceOf(addr1.address);
@@ -251,48 +251,48 @@ describe('ERC20Delegatable', async () => {
             expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(balanceBefore.sub(delegatorBalance));
         });
 
-        it('should reset delegatee in delegation contract', async () => {
+        it('should reset delegatee in delegation contract', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContractsAndDelegate);
             await erc20delegatable.undelegate(delegationTopic.address);
             expect(await delegationTopic.delegated(addr1.address)).to.equal(constants.ZERO_ADDRESS);
         });
 
-        it('should not udelegatee not existed delegation contract', async () => {
+        it('should not udelegatee not existed delegation contract', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContractsAndDelegate);
             await erc20delegatable.undelegate(delegationTopic.address);
             await expect(erc20delegatable.undelegate(delegationTopic.address))
                 .to.be.revertedWithCustomError(erc20delegatable, 'DelegationNotExist');
         });
 
-        describe('should not revert when delegation contract methods', async () => {
+        describe('should not revert when delegation contract methods', function () {
             async function initContractsAndDelegate2 () {
                 const { erc20delegatable, delegationTopic, wrongDelegation } = await initContractsAndDelegate();
                 await erc20delegatable.delegate(wrongDelegation.address, delegatee.address);
                 return { erc20delegatable, delegationTopic, wrongDelegation };
             };
 
-            it('reverting at setDelegate', async () => {
+            it('reverting at setDelegate', async function () {
                 const { erc20delegatable, wrongDelegation } = await loadFixture(initContractsAndDelegate2);
                 await wrongDelegation.setMethodReverting('setDelegate', true);
                 await erc20delegatable.undelegate(wrongDelegation.address);
                 expect(await erc20delegatable.userIsDelegating(addr1.address, wrongDelegation.address)).to.equal(false);
             });
 
-            it('has OutOfGas at setDelegate', async () => {
+            it('has OutOfGas at setDelegate', async function () {
                 const { erc20delegatable, wrongDelegation } = await loadFixture(initContractsAndDelegate2);
                 await wrongDelegation.setMethodOutOfGas('setDelegate', true);
                 await erc20delegatable.undelegate(wrongDelegation.address);
                 expect(await erc20delegatable.userIsDelegating(addr1.address, wrongDelegation.address)).to.equal(false);
             });
 
-            it('reverting at updateBalances', async () => {
+            it('reverting at updateBalances', async function () {
                 const { erc20delegatable, wrongDelegation } = await loadFixture(initContractsAndDelegate2);
                 await wrongDelegation.setMethodReverting('updateBalances', true);
                 await erc20delegatable.undelegate(wrongDelegation.address);
                 expect(await erc20delegatable.userIsDelegating(addr1.address, wrongDelegation.address)).to.equal(false);
             });
 
-            it('has OutOfGas at updateBalances', async () => {
+            it('has OutOfGas at updateBalances', async function () {
                 const { erc20delegatable, wrongDelegation } = await loadFixture(initContractsAndDelegate2);
                 await wrongDelegation.setMethodOutOfGas('updateBalances', true);
                 await erc20delegatable.undelegate(wrongDelegation.address);
@@ -301,7 +301,7 @@ describe('ERC20Delegatable', async () => {
         });
     });
 
-    describe('undelegateAll', async () => {
+    describe('undelegateAll', function () {
         async function initContractsAndDelegations () {
             const { erc20delegatable } = await initContracts();
             const amount = BN.from(ether('1'));
@@ -311,7 +311,7 @@ describe('ERC20Delegatable', async () => {
             return { erc20delegatable, delegations };
         };
 
-        it('should undelegate all delegations', async () => {
+        it('should undelegate all delegations', async function () {
             const { erc20delegatable, delegations } = await loadFixture(initContractsAndDelegations);
             await erc20delegatable.undelegateAll();
             for (let i = 0; i < MAX_USER_DELEGATIONS; i++) {
@@ -320,7 +320,7 @@ describe('ERC20Delegatable', async () => {
             }
         });
 
-        it('should decrease delegatee\'s balance in all delegation contracts', async () => {
+        it('should decrease delegatee\'s balance in all delegation contracts', async function () {
             const { erc20delegatable, delegations } = await loadFixture(initContractsAndDelegations);
             const delegationBalancesBefore = [];
             const delegatorBalance = await erc20delegatable.balanceOf(addr1.address);
@@ -334,7 +334,7 @@ describe('ERC20Delegatable', async () => {
             }
         });
 
-        it('should reset delegatee in all delegation contracts', async () => {
+        it('should reset delegatee in all delegation contracts', async function () {
             const { erc20delegatable, delegations } = await loadFixture(initContractsAndDelegations);
             await erc20delegatable.undelegateAll();
             for (let i = 0; i < MAX_USER_DELEGATIONS; i++) {
@@ -343,7 +343,7 @@ describe('ERC20Delegatable', async () => {
         });
     });
 
-    describe('_beforeTokenTransfer', async () => {
+    describe('_beforeTokenTransfer', function () {
         async function initContractsAndDelegations () {
             const { erc20delegatable, wrongDelegation } = await initContracts();
             const addr1Amount = BN.from(ether('1'));
@@ -366,7 +366,7 @@ describe('ERC20Delegatable', async () => {
             return { delegateeBalancesBefore, newDelegateeBalancesBefore };
         }
 
-        it('should nothing changed when account send tokens to himself', async () => {
+        it('should nothing changed when account send tokens to himself', async function () {
             const { erc20delegatable, delegations, addr1Amount } = await loadFixture(initContractsAndDelegations);
             const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
             await erc20delegatable.transfer(addr1.address, addr1Amount.div(2));
@@ -376,7 +376,7 @@ describe('ERC20Delegatable', async () => {
             }
         });
 
-        it('should nothing changed when account send 0 tokens', async () => {
+        it('should nothing changed when account send 0 tokens', async function () {
             const { erc20delegatable, delegations } = await loadFixture(initContractsAndDelegations);
             const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
             await erc20delegatable.transfer(addr2.address, '0');
@@ -386,8 +386,8 @@ describe('ERC20Delegatable', async () => {
             }
         });
 
-        describe('should change delegatees balances in delegation contracts correctly after changing accounts balances', async () => {
-            it('when both parties are participating the same delegation', async () => {
+        describe('should change delegatees balances in delegation contracts correctly after changing accounts balances', function () {
+            it('when both parties are participating the same delegation', async function () {
                 const { erc20delegatable, delegations, addr1Amount } = await loadFixture(initContractsAndDelegations);
                 const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
                 const amount = addr1Amount.div(2);
@@ -398,7 +398,7 @@ describe('ERC20Delegatable', async () => {
                 }
             });
 
-            it('when sender is participating a delegation, but receiver is not', async () => {
+            it('when sender is participating a delegation, but receiver is not', async function () {
                 const { erc20delegatable, delegations, addr1Amount } = await loadFixture(initContractsAndDelegations);
                 const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
                 await erc20delegatable.connect(addr2).undelegateAll();
@@ -414,7 +414,7 @@ describe('ERC20Delegatable', async () => {
                 }
             });
 
-            it('when receiver is participating a delegation, but sender is not', async () => {
+            it('when receiver is participating a delegation, but sender is not', async function () {
                 const { erc20delegatable, delegations, addr1Amount } = await loadFixture(initContractsAndDelegations);
                 const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
                 await erc20delegatable.undelegateAll();
@@ -430,7 +430,7 @@ describe('ERC20Delegatable', async () => {
                 }
             });
 
-            it('when both parties are not participating the delegation', async () => {
+            it('when both parties are not participating the delegation', async function () {
                 const { erc20delegatable, delegations } = await loadFixture(initContractsAndDelegations);
                 const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
 
@@ -454,38 +454,38 @@ describe('ERC20Delegatable', async () => {
             return { erc20delegatable, addr1Amount };
         };
 
-        describe('should not revert when delegation contract methods reverting', async () => {
-            it('when both parties are participating the same delegation', async () => {
+        describe('should not revert when delegation contract methods reverting', function () {
+            it('when both parties are participating the same delegation', async function () {
                 const { erc20delegatable, addr1Amount } = await loadFixture(initContractsAndPrepare);
                 await erc20delegatable.transfer(addr2.address, addr1Amount);
             });
 
-            it('when sender is participating a delegation, but receiver is not', async () => {
+            it('when sender is participating a delegation, but receiver is not', async function () {
                 const { erc20delegatable, addr1Amount } = await loadFixture(initContractsAndPrepare);
                 await erc20delegatable.connect(addr2).undelegateAll();
                 await erc20delegatable.transfer(addr2.address, addr1Amount);
             });
 
-            it('when receiver is participating a delegation, but sender is not', async () => {
+            it('when receiver is participating a delegation, but sender is not', async function () {
                 const { erc20delegatable, addr1Amount } = await loadFixture(initContractsAndPrepare);
                 await erc20delegatable.undelegateAll();
                 await erc20delegatable.transfer(addr2.address, addr1Amount);
             });
         });
 
-        describe('should not revert when delegation contract methods has OutOfGas', async () => {
-            it('when both parties are participating the same delegation', async () => {
+        describe('should not revert when delegation contract methods has OutOfGas', function () {
+            it('when both parties are participating the same delegation', async function () {
                 const { erc20delegatable, addr1Amount } = await loadFixture(initContractsAndPrepare);
                 await erc20delegatable.transfer(addr2.address, addr1Amount);
             });
 
-            it('when sender is participating a delegation, but receiver is not', async () => {
+            it('when sender is participating a delegation, but receiver is not', async function () {
                 const { erc20delegatable, addr1Amount } = await loadFixture(initContractsAndPrepare);
                 await erc20delegatable.connect(addr2).undelegateAll();
                 await erc20delegatable.transfer(addr2.address, addr1Amount);
             });
 
-            it('when receiver is participating a delegation, but sender is not', async () => {
+            it('when receiver is participating a delegation, but sender is not', async function () {
                 const { erc20delegatable, addr1Amount } = await loadFixture(initContractsAndPrepare);
                 await erc20delegatable.undelegateAll();
                 await erc20delegatable.transfer(addr2.address, addr1Amount);
