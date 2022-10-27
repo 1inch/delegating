@@ -1,7 +1,6 @@
 const { constants, expect, ether } = require('@1inch/solidity-utils');
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { ethers } = require('hardhat');
-const { BigNumber: BN } = require('ethers');
 
 const MAX_USER_DELEGATIONS = 7;
 
@@ -179,7 +178,7 @@ describe('ERC20Delegatable', function () {
 
         it('should increase delegatee\'s balance in delegation contract', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
-            const amount = BN.from(ether('1'));
+            const amount = ether('1');
             await erc20delegatable.mint(addr1.address, amount);
 
             expect(await delegationTopic.balanceOf(delegatee.address)).to.equal('0');
@@ -189,7 +188,7 @@ describe('ERC20Delegatable', function () {
 
         it('should decrease delegatee\'s balance in delegation contract after redelegation to another delegatee', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
-            const amount = BN.from(ether('1'));
+            const amount = ether('1');
             await erc20delegatable.mint(addr1.address, amount);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
 
@@ -204,33 +203,33 @@ describe('ERC20Delegatable', function () {
 
         it('should increase delegatee\'s balance in delegation contract after increasing delegator balance', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
-            const amount = BN.from(ether('1'));
-            const additionalAmount = BN.from(ether('0.5'));
+            const amount = ether('1');
+            const additionalAmount = ether('0.5');
             await erc20delegatable.mint(addr1.address, amount);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
 
             expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(amount);
             await erc20delegatable.mint(addr1.address, additionalAmount);
-            expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(amount.add(additionalAmount));
+            expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(amount + additionalAmount);
         });
 
         it('should decrease delegatee\'s balance in delegation contract after decreasing delegator balance', async function () {
             const { erc20delegatable, delegationTopic } = await loadFixture(initContracts);
-            const amount = BN.from(ether('1'));
-            const additionalAmount = BN.from(ether('0.5'));
+            const amount = ether('1');
+            const additionalAmount = ether('0.5');
             await erc20delegatable.mint(addr1.address, amount);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
 
             expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(amount);
             await erc20delegatable.transfer(addr2.address, additionalAmount);
-            expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(amount.sub(additionalAmount));
+            expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(amount - additionalAmount);
         });
     });
 
     describe('undelegate', function () {
         async function initContractsAndDelegate () {
             const { erc20delegatable, delegationTopic, wrongDelegation } = await initContracts();
-            const amount = BN.from(ether('1'));
+            const amount = ether('1');
             await erc20delegatable.mint(addr1.address, amount);
             await erc20delegatable.delegate(delegationTopic.address, delegatee.address);
             return { erc20delegatable, delegationTopic, wrongDelegation };
@@ -304,7 +303,7 @@ describe('ERC20Delegatable', function () {
     describe('undelegateAll', function () {
         async function initContractsAndDelegations () {
             const { erc20delegatable } = await initContracts();
-            const amount = BN.from(ether('1'));
+            const amount = ether('1');
             await erc20delegatable.mint(addr1.address, amount);
             const delegations = await createDelegations(MAX_USER_DELEGATIONS, erc20delegatable);
             await delegate(delegations, delegatee, addr1, erc20delegatable);
@@ -346,8 +345,8 @@ describe('ERC20Delegatable', function () {
     describe('_beforeTokenTransfer', function () {
         async function initContractsAndDelegations () {
             const { erc20delegatable, wrongDelegation } = await initContracts();
-            const addr1Amount = BN.from(ether('1'));
-            const addr2Amount = BN.from(ether('2.5'));
+            const addr1Amount = ether('1');
+            const addr2Amount = ether('2.5');
             await erc20delegatable.mint(addr1.address, addr1Amount);
             await erc20delegatable.mint(addr2.address, addr2Amount);
             const delegations = await createDelegations(MAX_USER_DELEGATIONS, erc20delegatable);
@@ -369,7 +368,7 @@ describe('ERC20Delegatable', function () {
         it('should nothing changed when account send tokens to himself', async function () {
             const { erc20delegatable, delegations, addr1Amount } = await loadFixture(initContractsAndDelegations);
             const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
-            await erc20delegatable.transfer(addr1.address, addr1Amount.div(2));
+            await erc20delegatable.transfer(addr1.address, addr1Amount / 2n);
             for (let i = 0; i < MAX_USER_DELEGATIONS; i++) {
                 expect(await delegations[i].balanceOf(delegatee.address)).to.equal(delegateeBalancesBefore[i]);
                 expect(await delegations[i].balanceOf(newDelegatee.address)).to.equal(newDelegateeBalancesBefore[i]);
@@ -390,7 +389,7 @@ describe('ERC20Delegatable', function () {
             it('when both parties are participating the same delegation', async function () {
                 const { erc20delegatable, delegations, addr1Amount } = await loadFixture(initContractsAndDelegations);
                 const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
-                const amount = addr1Amount.div(2);
+                const amount = addr1Amount / 2n;
                 await erc20delegatable.transfer(addr2.address, amount);
                 for (let i = 0; i < MAX_USER_DELEGATIONS; i++) {
                     expect(await delegations[i].balanceOf(delegatee.address)).to.equal(delegateeBalancesBefore[i].sub(amount));
@@ -406,7 +405,7 @@ describe('ERC20Delegatable', function () {
                     newDelegateeBalancesBefore[i] = await delegations[i].balanceOf(newDelegatee.address);
                 }
 
-                const amount = addr1Amount.div(2);
+                const amount = addr1Amount / 2n;
                 await erc20delegatable.transfer(addr2.address, amount);
                 for (let i = 0; i < MAX_USER_DELEGATIONS; i++) {
                     expect(await delegations[i].balanceOf(delegatee.address)).to.equal(delegateeBalancesBefore[i].sub(amount));
@@ -422,7 +421,7 @@ describe('ERC20Delegatable', function () {
                     delegateeBalancesBefore[i] = await delegations[i].balanceOf(delegatee.address);
                 }
 
-                const amount = addr1Amount.div(2);
+                const amount = addr1Amount / 2n;
                 await erc20delegatable.transfer(addr2.address, amount);
                 for (let i = 0; i < MAX_USER_DELEGATIONS; i++) {
                     expect(await delegations[i].balanceOf(delegatee.address)).to.equal(delegateeBalancesBefore[i]);
@@ -434,7 +433,7 @@ describe('ERC20Delegatable', function () {
                 const { erc20delegatable, delegations } = await loadFixture(initContractsAndDelegations);
                 const { delegateeBalancesBefore, newDelegateeBalancesBefore } = await loadBalances(delegations, delegatee, newDelegatee);
 
-                const amount = BN.from(ether('1'));
+                const amount = ether('1');
                 await erc20delegatable.mint(addr3.address, amount);
                 await erc20delegatable.connect(addr3).transfer(erc20delegatable.address, amount);
                 for (let i = 0; i < MAX_USER_DELEGATIONS; i++) {

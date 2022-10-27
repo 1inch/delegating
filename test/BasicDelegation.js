@@ -1,18 +1,16 @@
 const { constants, expect, ether } = require('@1inch/solidity-utils');
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { ethers } = require('hardhat');
-const { BigNumber: BN } = require('ethers');
 
 describe('BasicDelegationTopic', function () {
     let addr1, addr2, delegatee, newDelegatee;
-    let BasicDelegationTopic;
 
     before(async function () {
         [addr1, addr2, delegatee, newDelegatee] = await ethers.getSigners();
-        BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
     });
 
     async function initContracts () {
+        const BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
         const delegationTopic = await BasicDelegationTopic.deploy('basic1INCH', 'basic1INCH');
         await delegationTopic.deployed();
         return { delegationTopic };
@@ -47,7 +45,7 @@ describe('BasicDelegationTopic', function () {
             const { delegationTopic } = await initContracts();
             await delegationTopic.setDelegate(addr1.address, delegatee.address);
             await delegationTopic.setDelegate(addr2.address, newDelegatee.address);
-            const amount = BN.from(ether('1'));
+            const amount = ether('1');
             return { delegationTopic, amount };
         }
 
@@ -60,7 +58,7 @@ describe('BasicDelegationTopic', function () {
 
         it('`addr1 -> address(0)` should decrease delegatee balance', async function () {
             const { delegationTopic, amount } = await loadFixture(initContractsAndDelegate);
-            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1.address, amount.mul(5));
+            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1.address, amount * 5n);
             const balanceBefore = await delegationTopic.balanceOf(delegatee.address);
             await delegationTopic.updateBalances(addr1.address, constants.ZERO_ADDRESS, amount);
             expect(await delegationTopic.balanceOf(delegatee.address)).to.equal(balanceBefore.sub(amount));
@@ -68,8 +66,8 @@ describe('BasicDelegationTopic', function () {
 
         it('`addr1 -> addr2` should change delegatee balances', async function () {
             const { delegationTopic, amount } = await loadFixture(initContractsAndDelegate);
-            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1.address, amount.mul(10));
-            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr2.address, amount.mul(20));
+            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr1.address, amount * 10n);
+            await delegationTopic.updateBalances(constants.ZERO_ADDRESS, addr2.address, amount * 20n);
             const balanceBeforeDelegatee = await delegationTopic.balanceOf(delegatee.address);
             const balanceBeforeNewDelegatee = await delegationTopic.balanceOf(newDelegatee.address);
             await delegationTopic.updateBalances(addr1.address, addr2.address, amount);
@@ -81,19 +79,19 @@ describe('BasicDelegationTopic', function () {
     describe('ERC20 overrides', function () {
         it('should not transfer', async function () {
             const { delegationTopic } = await loadFixture(initContracts);
-            await expect(delegationTopic.transfer(addr2.address, BN.from(ether('1'))))
+            await expect(delegationTopic.transfer(addr2.address, ether('1')))
                 .to.be.revertedWithCustomError(delegationTopic, 'MethodDisabled');
         });
 
         it('should not transferFrom', async function () {
             const { delegationTopic } = await loadFixture(initContracts);
-            await expect(delegationTopic.transferFrom(addr2.address, delegatee.address, BN.from(ether('1'))))
+            await expect(delegationTopic.transferFrom(addr2.address, delegatee.address, ether('1')))
                 .to.be.revertedWithCustomError(delegationTopic, 'MethodDisabled');
         });
 
         it('should not approve', async function () {
             const { delegationTopic } = await loadFixture(initContracts);
-            await expect(delegationTopic.approve(addr2.address, BN.from(ether('1'))))
+            await expect(delegationTopic.approve(addr2.address, ether('1')))
                 .to.be.revertedWithCustomError(delegationTopic, 'MethodDisabled');
         });
     });
