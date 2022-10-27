@@ -4,17 +4,16 @@ const { ethers } = require('hardhat');
 
 describe('RewardableDelegationTopic', function () {
     let addr1, addr2, delegatee, newDelegatee;
-    let RewardableDelegationTopic;
     let DelegateeToken;
     const MAX_FARM = 5;
 
     before(async function () {
         [addr1, addr2, delegatee, newDelegatee] = await ethers.getSigners();
-        RewardableDelegationTopic = await ethers.getContractFactory('RewardableDelegationTopic');
         DelegateeToken = await ethers.getContractFactory('DelegateeToken');
     });
 
     async function initContracts () {
+        const RewardableDelegationTopic = await ethers.getContractFactory('RewardableDelegationTopic');
         const delegationTopic = await RewardableDelegationTopic.deploy('Rewardable', 'RWD');
         await delegationTopic.deployed();
         return { delegationTopic };

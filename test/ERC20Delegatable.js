@@ -6,23 +6,20 @@ const MAX_USER_DELEGATIONS = 7;
 
 describe('ERC20Delegatable', function () {
     let addr1, addr2, addr3, delegatee, newDelegatee;
-    let BasicDelegationTopic;
-    let ERC20DelegatableMock;
-    let WrongDelegation;
 
     before(async function () {
         [addr1, addr2, addr3, delegatee, newDelegatee] = await ethers.getSigners();
-        BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
-        ERC20DelegatableMock = await ethers.getContractFactory('ERC20DelegatableMock');
-        WrongDelegation = await ethers.getContractFactory('WrongDelegation');
     });
 
     async function initContracts () {
+        const ERC20DelegatableMock = await ethers.getContractFactory('ERC20DelegatableMock');
         const erc20delegatable = await ERC20DelegatableMock.deploy('st1INCH', 'st1INCH', MAX_USER_DELEGATIONS);
         await erc20delegatable.deployed();
+        const BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
         const delegationTopic = await BasicDelegationTopic.deploy('DelegationContract', 'DC');
         await delegationTopic.deployed();
         await delegationTopic.transferOwnership(erc20delegatable.address);
+        const WrongDelegation = await ethers.getContractFactory('WrongDelegation');
         const wrongDelegation = await WrongDelegation.deploy('WrongDelegationContract', 'WDC');
         await wrongDelegation.deployed();
         await wrongDelegation.transferOwnership(erc20delegatable.address);
@@ -30,6 +27,7 @@ describe('ERC20Delegatable', function () {
     };
 
     async function createDelegations(amount, erc20delegatable) {
+        const BasicDelegationTopic = await ethers.getContractFactory('BasicDelegationTopic');
         const delegations = [];
         for (let i = 0; i < amount; i++) {
             delegations.push(await BasicDelegationTopic.deploy(`DelegationContract${i}`, `DC${i}`));
