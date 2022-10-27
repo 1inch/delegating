@@ -10,3 +10,4 @@ hardhat-dependency-compiler
 .coverage_artifacts
 .env
 .idea
+yarn-error.log
