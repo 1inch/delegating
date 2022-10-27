@@ -30,7 +30,7 @@ describe('ERC20Delegatable', function () {
         return { erc20delegatable, delegationTopic, wrongDelegation };
     };
 
-    const createDelegations = async (amount, erc20delegatable) => {
+    async function createDelegations(amount, erc20delegatable) {
         const delegations = [];
         for (let i = 0; i < amount; i++) {
             delegations.push(await BasicDelegationTopic.deploy(`DelegationContract${i}`, `DC${i}`));
@@ -40,7 +40,7 @@ describe('ERC20Delegatable', function () {
         return delegations;
     };
 
-    const delegate = async (delegations, delegatee, delegator, erc20delegatable) => {
+    async function delegate(delegations, delegatee, delegator, erc20delegatable) {
         for (const delegation of delegations) {
             await erc20delegatable.connect(delegator).delegate(delegation.address, delegatee.address);
         }
