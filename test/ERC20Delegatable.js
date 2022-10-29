@@ -264,7 +264,7 @@ describe('ERC20Delegatable', function () {
             const { erc20delegatable, delegationPod } = await loadFixture(initContractsAndDelegate);
             await erc20delegatable.removePod(delegationPod.address);
             await expect(erc20delegatable.removePod(delegationPod.address))
-                .to.be.revertedWithCustomError(erc20delegatable, 'PodIsNotAttached');
+                .to.be.revertedWithCustomError(erc20delegatable, 'PodNotFound');
         });
 
         describe('should not revert when delegation contract methods', function () {
