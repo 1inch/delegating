@@ -4,17 +4,19 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "erc20-pods/contracts/Pod.sol";
 
-import "../interfaces/IDelegationTopic.sol";
+import "../interfaces/IDelegationPod.sol";
 
-contract WrongDelegation is IDelegationTopic, ERC20, Ownable {
+contract WrongDelegation is IDelegationPod, Pod, ERC20 {
     error DelegationContractRevert();
 
     mapping(string => bool) public isRevert;
     mapping(string => bool) public isOutOfGas;
 
-    // solhint-disable-next-line no-empty-blocks
-    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_, address token)
+        ERC20(name_, symbol_) Pod(token)
+    {}  // solhint-disable-line no-empty-blocks
 
     function delegated(address /* account */) external view returns(address) {
         if (isRevert["delegated"]) revert DelegationContractRevert();
@@ -22,12 +24,12 @@ contract WrongDelegation is IDelegationTopic, ERC20, Ownable {
         return address(0);
     }
 
-    function setDelegate(address /* account */, address /* delegatee */) public virtual onlyOwner {
-        if (isRevert["setDelegate"]) revert DelegationContractRevert();
-        if (isOutOfGas["setDelegate"]) assert(false);
+    function delegate(address /* delegatee */) public virtual {
+        if (isRevert["delegate"]) revert DelegationContractRevert();
+        if (isOutOfGas["delegate"]) assert(false);
     }
 
-    function updateBalances(address /* from */, address /* to */, uint256 /* amount */) public virtual onlyOwner {
+    function updateBalances(address /* from */, address /* to */, uint256 /* amount */) public virtual onlyToken {
         if (isRevert["updateBalances"]) revert DelegationContractRevert();
         if (isOutOfGas["updateBalances"]) assert(false);
     }

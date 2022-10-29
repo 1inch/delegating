@@ -1,0 +1,80 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "erc20-pods/contracts/interfaces/IERC20Pods.sol";
+import "erc20-pods/contracts/Pod.sol";
+
+import "../interfaces/IDelegationPod.sol";
+
+/// @dev owner of BasicDelegationPod should be set to ERC20Delegatable contract
+contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
+    error MethodDisabled();
+
+    mapping(address => address) public delegated;
+
+    constructor(string memory name_, string memory symbol_, address token)
+        ERC20(name_, symbol_) Pod(token)
+    {}  // solhint-disable-line no-empty-blocks
+
+    function delegatingBalanceOf(address account) public view returns (uint256) {
+        if (IERC20Pods(token).hasPod(account, address(this))) {
+            return IERC20Pods(token).balanceOf(account);
+        }
+        return 0;
+    }
+
+    function delegate(address delegatee) public virtual {
+        address prevDelegatee = delegated[msg.sender];
+        if (prevDelegatee != delegatee) {
+            uint256 balance = delegatingBalanceOf(msg.sender);
+            if (prevDelegatee != address(0)) {
+                if (balance > 0) {
+                    _burn(prevDelegatee, balance);
+                }
+                emit Undelegate(msg.sender, prevDelegatee);
+            }
+            if (delegatee != address(0)) {
+                if (balance > 0) {
+                    _mint(delegatee, balance);
+                }
+                emit Delegate(msg.sender, delegatee);
+            }
+            delegated[msg.sender] = delegatee;
+        }
+    }
+
+    function updateBalances(address from, address to, uint256 amount) public virtual onlyToken {
+        if (from == address(0)) {
+            _mint(delegated[to], amount);
+            return;
+        }
+
+        if (to == address(0)) {
+            _burn(delegated[from], amount);
+            return;
+        }
+
+        address fromDelegatee = delegated[from];
+        address toDelegatee = delegated[to];
+        if (fromDelegatee != toDelegatee) {
+            _burn(fromDelegatee, amount);
+            _mint(toDelegatee, amount);
+        }
+    }
+
+    // ERC20 overrides
+
+    function transfer(address /* to */, uint256 /* amount */) public virtual override(IERC20, ERC20) returns (bool) {
+        revert MethodDisabled();
+    }
+
+    function transferFrom(address /* from */, address /* to */, uint256 /* amount */) public virtual override(IERC20, ERC20) returns (bool) {
+        revert MethodDisabled();
+    }
+
+    function approve(address /* spender */, uint256 /* amount */) public virtual override(IERC20, ERC20) returns (bool) {
+        revert MethodDisabled();
+    }
+}

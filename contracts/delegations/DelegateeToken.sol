@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@1inch/farming/contracts/ERC20Farmable.sol";
+import "erc20-pods/contracts/ERC20Pods.sol";
 import "../interfaces/IDelegateeToken.sol";
 
-contract DelegateeToken is IDelegateeToken, ERC20Farmable, Ownable {
+contract DelegateeToken is IDelegateeToken, ERC20Pods, Ownable {
     error ApproveDisabled();
     error TransferDisabled();
     error TransferFromDisabled();
@@ -16,7 +16,7 @@ contract DelegateeToken is IDelegateeToken, ERC20Farmable, Ownable {
         string memory name,
         string memory symbol,
         uint256 maxUserFarms
-    ) ERC20(name, symbol) ERC20Farmable(maxUserFarms) {} // solhint-disable-line no-empty-blocks
+    ) ERC20(name, symbol) ERC20Pods(maxUserFarms) {} // solhint-disable-line no-empty-blocks
 
     function mint(address account, uint256 amount) external onlyOwner {
         _mint(account, amount);

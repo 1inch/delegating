@@ -3,11 +3,11 @@
 pragma solidity ^0.8.0;
 
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
-import "./BasicDelegationTopic.sol";
+import "./BasicDelegationPod.sol";
 import "./DelegateeToken.sol";
 import "../interfaces/IDelegateeToken.sol";
 
-contract RewardableDelegationTopic is BasicDelegationTopic {
+contract RewardableDelegationPod is BasicDelegationPod {
     using AddressSet for AddressSet.Data;
 
     error NotRegisteredDelegatee();
@@ -23,20 +23,22 @@ contract RewardableDelegationTopic is BasicDelegationTopic {
     }
 
     // solhint-disable-next-line no-empty-blocks
-    constructor(string memory name_, string memory symbol_) BasicDelegationTopic(name_, symbol_) {}
+    constructor(string memory name_, string memory symbol_, address token) BasicDelegationPod(name_, symbol_, token) {}
 
-    function setDelegate(address account, address delegatee) public override {
+    function delegate(address delegatee) public override {
         if (delegatee != address(0) && registration[delegatee] == IDelegateeToken(address(0))) revert NotRegisteredDelegatee();
-        super.setDelegate(account, delegatee);
+        super.delegate(delegatee);
     }
 
     function updateBalances(address from, address to, uint256 amount) public override {
         super.updateBalances(from, to, amount);
 
         if (to != address(0)) {
+            // TODO: discuss why do we need to try here?
             try registration[delegated[to]].mint{gas:200_000}(to, amount) {} catch {} // solhint-disable-line no-empty-blocks
         }
         if (from != address(0)) {
+            // TODO: discuss why do we need to try here?
             try registration[delegated[from]].burn{gas:200_000}(from, amount) {} catch {} // solhint-disable-line no-empty-blocks
         }
     }
