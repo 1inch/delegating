@@ -19,8 +19,8 @@ describe('ERC20Delegatable', function () {
         await erc20delegatable.deployed();
         const delegationPod = await BasicDelegationPod.deploy('DelegationContract', 'DC', erc20delegatable.address);
         await delegationPod.deployed();
-        const WrongDelegation = await ethers.getContractFactory('WrongDelegation');
-        const wrongDelegation = await WrongDelegation.deploy('WrongDelegationContract', 'WDC', erc20delegatable.address);
+        const WrongDelegationMock = await ethers.getContractFactory('WrongDelegationMock');
+        const wrongDelegation = await WrongDelegationMock.deploy('WrongDelegationContract', 'WDC', erc20delegatable.address);
         await wrongDelegation.deployed();
         return { erc20delegatable, delegationPod, wrongDelegation };
     };
@@ -277,28 +277,28 @@ describe('ERC20Delegatable', function () {
 
             it('reverting at delegate', async function () {
                 const { erc20delegatable, wrongDelegation } = await loadFixture(initContractsAndDelegate2);
-                await wrongDelegation.setMethodReverting('delegate', true);
+                await wrongDelegation.setMethodReverting(wrongDelegation.interface.getSighash('delegate'), true);
                 await erc20delegatable.removePod(wrongDelegation.address);
                 expect(await erc20delegatable.hasPod(addr1.address, wrongDelegation.address)).to.equal(false);
             });
 
             it('has OutOfGas at delegate', async function () {
                 const { erc20delegatable, wrongDelegation } = await loadFixture(initContractsAndDelegate2);
-                await wrongDelegation.setMethodOutOfGas('delegate', true);
+                await wrongDelegation.setMethodOutOfGas(wrongDelegation.interface.getSighash('delegate'), true);
                 await erc20delegatable.removePod(wrongDelegation.address);
                 expect(await erc20delegatable.hasPod(addr1.address, wrongDelegation.address)).to.equal(false);
             });
 
             it('reverting at updateBalances', async function () {
                 const { erc20delegatable, wrongDelegation } = await loadFixture(initContractsAndDelegate2);
-                await wrongDelegation.setMethodReverting('updateBalances', true);
+                await wrongDelegation.setMethodReverting(wrongDelegation.interface.getSighash('updateBalances'), true);
                 await erc20delegatable.removePod(wrongDelegation.address);
                 expect(await erc20delegatable.hasPod(addr1.address, wrongDelegation.address)).to.equal(false);
             });
 
             it('has OutOfGas at updateBalances', async function () {
                 const { erc20delegatable, wrongDelegation } = await loadFixture(initContractsAndDelegate2);
-                await wrongDelegation.setMethodOutOfGas('updateBalances', true);
+                await wrongDelegation.setMethodOutOfGas(wrongDelegation.interface.getSighash('updateBalances'), true);
                 await erc20delegatable.removePod(wrongDelegation.address);
                 expect(await erc20delegatable.hasPod(addr1.address, wrongDelegation.address)).to.equal(false);
             });
@@ -454,7 +454,7 @@ describe('ERC20Delegatable', function () {
             await erc20delegatable.connect(addr2).removePod(delegations[0].address);
             await wrongDelegation.delegate(delegatee.address);
             await wrongDelegation.connect(addr2).delegate(newDelegatee.address);
-            await wrongDelegation.setMethodReverting('updateBalances', true);
+            await wrongDelegation.setMethodReverting(wrongDelegation.interface.getSighash('updateBalances'), true);
             return { erc20delegatable, addr1Amount };
         };
 
