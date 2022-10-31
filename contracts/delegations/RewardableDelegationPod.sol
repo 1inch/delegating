@@ -15,9 +15,15 @@ contract RewardableDelegationPod is BasicDelegationPod {
     error AnotherDelegateeToken();
 
     mapping(address => IDelegateeToken) public registration;
+    mapping(address => address) public defaultFarms;
     AddressSet.Data private _delegateeTokens;
 
-    modifier onlyNotRegistered() {
+    modifier onlyRegistered {
+        if (address(registration[msg.sender]) == address(0)) revert AlreadyRegistered();
+        _;
+    }
+
+    modifier onlyNotRegistered {
         if (address(registration[msg.sender]) != address(0)) revert AlreadyRegistered();
         _;
     }
@@ -26,8 +32,10 @@ contract RewardableDelegationPod is BasicDelegationPod {
     constructor(string memory name_, string memory symbol_, address token) BasicDelegationPod(name_, symbol_, token) {}
 
     function delegate(address delegatee) public override {
-        if (delegatee != address(0) && registration[delegatee] == IDelegateeToken(address(0))) revert NotRegisteredDelegatee();
+        IDelegateeToken delegateeToken = registration[msg.sender];
+        if (delegatee != address(0) && delegateeToken == IDelegateeToken(address(0))) revert NotRegisteredDelegatee();
         super.delegate(delegatee);
+        delegateeToken.addDefaultFarmIfNeeded(msg.sender, defaultFarms[delegatee]);
     }
 
     function updateBalances(address from, address to, uint256 amount) public override {
@@ -53,5 +61,9 @@ contract RewardableDelegationPod is BasicDelegationPod {
     function register(IDelegateeToken token) external onlyNotRegistered {
         if (!_delegateeTokens.add(address(token))) revert AnotherDelegateeToken();
         registration[msg.sender] = token;
+    }
+
+    function setDefaultFarm(address farm) external onlyRegistered {
+        defaultFarms[msg.sender] = farm;
     }
 }

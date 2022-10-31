@@ -18,6 +18,12 @@ contract DelegateeToken is IDelegateeToken, ERC20Pods, Ownable {
         uint256 maxUserFarms
     ) ERC20(name, symbol) ERC20Pods(maxUserFarms) {} // solhint-disable-line no-empty-blocks
 
+    function addDefaultFarmIfNeeded(address account, address farm) external onlyOwner {
+        if (!hasPod(account, farm)) {
+            _addPod(account, farm);
+        }
+    }
+
     function mint(address account, uint256 amount) external onlyOwner {
         _mint(account, amount);
     }
