@@ -3,8 +3,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "erc20-pods/contracts/interfaces/IERC20Pods.sol";
-import "erc20-pods/contracts/Pod.sol";
+import "@1inch/erc20-pods/contracts/interfaces/IERC20Pods.sol";
+import "@1inch/erc20-pods/contracts/Pod.sol";
 
 import "../interfaces/IDelegationPod.sol";
 
@@ -30,12 +30,8 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
         if (prevDelegatee != delegatee) {
             uint256 balance = delegatingBalanceOf(msg.sender);
             if (balance > 0) {
-                if (prevDelegatee != address(0)) {
-                    _burn(prevDelegatee, balance);
-                }
-                if (delegatee != address(0)) {
-                    _mint(delegatee, balance);
-                }
+                _burn(prevDelegatee, balance);
+                _mint(delegatee, balance);
             }
             emit Delegate(msg.sender, delegatee);
             delegated[msg.sender] = delegatee;
@@ -62,6 +58,18 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
     }
 
     // ERC20 overrides
+
+    function _mint(address account, uint256 amount) internal virtual override {
+        if (account != address(0)) {
+            super._mint(account, amount);
+        }
+    }
+
+    function _burn(address account, uint256 amount) internal virtual override {
+        if (account != address(0)) {
+            super._burn(account, amount);
+        }
+    }
 
     function transfer(address /* to */, uint256 /* amount */) public virtual override(IERC20, ERC20) returns (bool) {
         revert MethodDisabled();
