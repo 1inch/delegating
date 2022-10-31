@@ -4,8 +4,8 @@ pragma solidity ^0.8.0;
 
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 import "./BasicDelegationPod.sol";
-import "./DelegateeToken.sol";
-import "../interfaces/IDelegateeToken.sol";
+import "./DelegatedShare.sol";
+import "../interfaces/IDelegatedShare.sol";
 
 contract RewardableDelegationPod is BasicDelegationPod {
     using AddressSet for AddressSet.Data;
@@ -14,7 +14,7 @@ contract RewardableDelegationPod is BasicDelegationPod {
     error AlreadyRegistered();
     error AnotherDelegateeToken();
 
-    mapping(address => IDelegateeToken) public registration;
+    mapping(address => IDelegatedShare) public registration;
     mapping(address => address) public defaultFarms;
     AddressSet.Data private _delegateeTokens;
 
@@ -32,10 +32,10 @@ contract RewardableDelegationPod is BasicDelegationPod {
     constructor(string memory name_, string memory symbol_, address token) BasicDelegationPod(name_, symbol_, token) {}
 
     function delegate(address delegatee) public override {
-        IDelegateeToken delegateeToken = registration[msg.sender];
-        if (delegatee != address(0) && delegateeToken == IDelegateeToken(address(0))) revert NotRegisteredDelegatee();
+        IDelegatedShare delegatedShare = registration[msg.sender];
+        if (delegatee != address(0) && delegatedShare == IDelegatedShare(address(0))) revert NotRegisteredDelegatee();
         super.delegate(delegatee);
-        delegateeToken.addDefaultFarmIfNeeded(msg.sender, defaultFarms[delegatee]);
+        delegatedShare.addDefaultFarmIfNeeded(msg.sender, defaultFarms[delegatee]);
     }
 
     function updateBalances(address from, address to, uint256 amount) public override {
@@ -51,14 +51,14 @@ contract RewardableDelegationPod is BasicDelegationPod {
         }
     }
 
-    function register(string memory name, string memory symbol, uint256 maxUserFarms) external onlyNotRegistered returns(IDelegateeToken token) {
-        token = new DelegateeToken(name, symbol, maxUserFarms);
+    function register(string memory name, string memory symbol, uint256 maxUserFarms) external onlyNotRegistered returns(IDelegatedShare token) {
+        token = new DelegatedShare(name, symbol, maxUserFarms);
         registration[msg.sender] = token;
         _delegateeTokens.add(address(token));
     }
 
-    /// @dev owner of IDelegateeToken should be set to this contract
-    function register(IDelegateeToken token) external onlyNotRegistered {
+    /// @dev owner of IDelegatedShare should be set to this contract
+    function register(IDelegatedShare token) external onlyNotRegistered {
         if (!_delegateeTokens.add(address(token))) revert AnotherDelegateeToken();
         registration[msg.sender] = token;
     }
