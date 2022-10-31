@@ -29,18 +29,15 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
         address prevDelegatee = delegated[msg.sender];
         if (prevDelegatee != delegatee) {
             uint256 balance = delegatingBalanceOf(msg.sender);
-            if (prevDelegatee != address(0)) {
-                if (balance > 0) {
+            if (balance > 0) {
+                if (prevDelegatee != address(0)) {
                     _burn(prevDelegatee, balance);
                 }
-                emit Undelegate(msg.sender, prevDelegatee);
-            }
-            if (delegatee != address(0)) {
-                if (balance > 0) {
+                if (delegatee != address(0)) {
                     _mint(delegatee, balance);
                 }
-                emit Delegate(msg.sender, delegatee);
             }
+            emit Delegate(msg.sender, delegatee);
             delegated[msg.sender] = delegatee;
         }
     }

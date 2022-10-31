@@ -90,14 +90,6 @@ describe.skip('RewardableDelegationPod', function () {
             expect(receipt.events[0].event).to.equal('Delegate');
         });
 
-        it('should set delegate and emit Undelegate event', async function () {
-            const { delegationPod } = await loadFixture(initContractsAndRegister);
-            const tx = await delegationPod.delegate(constants.ZERO_ADDRESS);
-            const receipt = await tx.wait();
-            expect(await delegationPod.delegated(addr1.address)).to.equal(constants.ZERO_ADDRESS);
-            expect(receipt.events[0].event).to.equal('Undelegate');
-        });
-
         it('should delegate by only owner', async function () {
             const { delegationPod } = await loadFixture(initContractsAndRegister);
             await expect(delegationPod.connect(addr2).delegate(delegatee.address))

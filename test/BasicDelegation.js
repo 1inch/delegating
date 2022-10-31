@@ -24,14 +24,6 @@ describe.skip('BasicDelegationPod', function () {
             expect(await delegationPod.delegated(addr1.address)).to.equal(delegatee.address);
             expect(receipt.events[0].event).to.equal('Delegate');
         });
-
-        it('should set delegate and emit Undelegate event', async function () {
-            const { delegationPod } = await loadFixture(initContracts);
-            const tx = await delegationPod.delegate(constants.ZERO_ADDRESS);
-            const receipt = await tx.wait();
-            expect(await delegationPod.delegated(addr1.address)).to.be.equals(constants.ZERO_ADDRESS);
-            expect(receipt.events[0].event).to.equal('Undelegate');
-        });
     });
 
     describe('updateBalances', function () {
