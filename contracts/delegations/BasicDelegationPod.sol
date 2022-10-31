@@ -18,17 +18,10 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
         ERC20(name_, symbol_) Pod(token)
     {}  // solhint-disable-line no-empty-blocks
 
-    function delegatingBalanceOf(address account) public view returns (uint256) {
-        if (IERC20Pods(token).hasPod(account, address(this))) {
-            return IERC20Pods(token).balanceOf(account);
-        }
-        return 0;
-    }
-
     function delegate(address delegatee) public virtual {
         address prevDelegatee = delegated[msg.sender];
         if (prevDelegatee != delegatee) {
-            uint256 balance = delegatingBalanceOf(msg.sender);
+            uint256 balance = IERC20Pods(token).podBalanceOf(address(this), msg.sender);
             if (balance > 0) {
                 _burn(prevDelegatee, balance);
                 _mint(delegatee, balance);
