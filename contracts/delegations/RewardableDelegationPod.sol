@@ -34,12 +34,12 @@ contract RewardableDelegationPod is BasicDelegationPod {
         super.updateBalances(from, to, amount);
 
         if (to != address(0)) {
-            // TODO: discuss why do we need to try here?
-            try registration[delegated[to]].mint{gas:200_000}(to, amount) {} catch {} // solhint-disable-line no-empty-blocks
+            // Following call may be unsafe as we are already in safe call
+            registration[delegated[to]].mint(to, amount);
         }
         if (from != address(0)) {
-            // TODO: discuss why do we need to try here?
-            try registration[delegated[from]].burn{gas:200_000}(from, amount) {} catch {} // solhint-disable-line no-empty-blocks
+            // Following call may be unsafe as we are already in safe call
+            registration[delegated[from]].burn(from, amount);
         }
     }
 
