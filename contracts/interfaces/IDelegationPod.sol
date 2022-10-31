@@ -9,5 +9,5 @@ interface IDelegationPod is IPod, IERC20 {
     event Delegate(address account, address delegatee);
 
     function delegated(address account) external view returns(address);
-    function delegate(address delegatee) external; // onlyOwner
+    function delegate(address delegatee) external;
 }
