@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 import "./BasicDelegationPod.sol";
 import "./DelegatedShare.sol";
-import "../interfaces/IDelegatedShare.sol";
+import "./interfaces/IDelegatedShare.sol";
 
 contract RewardableDelegationPod is BasicDelegationPod {
     using AddressSet for AddressSet.Data;
@@ -19,7 +19,7 @@ contract RewardableDelegationPod is BasicDelegationPod {
     AddressSet.Data private _delegateeTokens;
 
     modifier onlyRegistered {
-        if (address(registration[msg.sender]) == address(0)) revert AlreadyRegistered();
+        if (address(registration[msg.sender]) == address(0)) revert NotRegisteredDelegatee();
         _;
     }
 
@@ -32,10 +32,12 @@ contract RewardableDelegationPod is BasicDelegationPod {
     constructor(string memory name_, string memory symbol_, address token) BasicDelegationPod(name_, symbol_, token) {}
 
     function delegate(address delegatee) public override {
-        IDelegatedShare delegatedShare = registration[msg.sender];
+        IDelegatedShare delegatedShare = registration[delegatee];
         if (delegatee != address(0) && delegatedShare == IDelegatedShare(address(0))) revert NotRegisteredDelegatee();
         super.delegate(delegatee);
-        delegatedShare.addDefaultFarmIfNeeded(msg.sender, defaultFarms[delegatee]);
+        if (defaultFarms[delegatee] != address(0)) {
+            delegatedShare.addDefaultFarmIfNeeded(msg.sender, defaultFarms[delegatee]);
+        }
     }
 
     function updateBalances(address from, address to, uint256 amount) public override {

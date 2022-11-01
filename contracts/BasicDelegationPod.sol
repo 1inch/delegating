@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@1inch/erc20-pods/contracts/interfaces/IERC20Pods.sol";
 import "@1inch/erc20-pods/contracts/Pod.sol";
 
-import "../interfaces/IDelegationPod.sol";
+import "./interfaces/IDelegationPod.sol";
 
 /// @dev owner of BasicDelegationPod should be set to ERC20Delegatable contract
 contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
