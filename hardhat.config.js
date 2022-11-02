@@ -30,4 +30,9 @@ module.exports = {
         enable: true,
         currency: 'USD',
     },
+    dependencyCompiler: {
+        paths: [
+            '@1inch/erc20-pods/contracts/mocks/ERC20PodsMock.sol',
+        ],
+    },
 };
