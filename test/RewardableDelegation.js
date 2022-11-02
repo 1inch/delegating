@@ -25,7 +25,7 @@ describe('RewardableDelegationPod', function () {
 
     async function initContractsAndRegister () {
         const { erc20Pods, delegationPod } = await initContracts();
-        await delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+        await delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName', 'TestTokenSymbol', MAX_FARM, constants.ZERO_ADDRESS);
         return { erc20Pods, delegationPod };
     };
 
@@ -34,7 +34,7 @@ describe('RewardableDelegationPod', function () {
             it('should registrate delegatee and create new token', async function () {
                 const { delegationPod } = await loadFixture(initContracts);
                 expect(await delegationPod.registration(delegatee.address)).to.equal(constants.ZERO_ADDRESS);
-                await delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                await delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName', 'TestTokenSymbol', MAX_FARM, constants.ZERO_ADDRESS);
                 const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
                 expect(await delegatedShare.name()).to.equal('TestTokenName');
                 expect(await delegatedShare.symbol()).to.equal('TestTokenSymbol');
@@ -42,7 +42,7 @@ describe('RewardableDelegationPod', function () {
 
             it('should mint and burn DelegatedShare only ReawardableDelegation', async function () {
                 const { delegationPod } = await loadFixture(initContracts);
-                await delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                await delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName', 'TestTokenSymbol', MAX_FARM, constants.ZERO_ADDRESS);
                 const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
                 await expect(delegatedShare.mint(addr1.address, '1000'))
                     .to.be.revertedWith('Ownable: caller is not the owner');
@@ -52,8 +52,8 @@ describe('RewardableDelegationPod', function () {
 
             it('should not double registrate', async function () {
                 const { delegationPod } = await loadFixture(initContracts);
-                await delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
-                await expect(delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName2', 'TestTokenSymbol2', MAX_FARM))
+                await delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName', 'TestTokenSymbol', MAX_FARM, constants.ZERO_ADDRESS);
+                await expect(delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName2', 'TestTokenSymbol2', MAX_FARM, constants.ZERO_ADDRESS))
                     .to.be.revertedWithCustomError(delegationPod, 'AlreadyRegistered');
             });
         });
@@ -63,23 +63,23 @@ describe('RewardableDelegationPod', function () {
                 const { delegationPod } = await loadFixture(initContracts);
                 const delegatedShare = await DelegatedShare.connect(delegatee).deploy('TestTokenName', 'TestTokenSymbol', MAX_FARM);
                 await delegatedShare.deployed();
-                await delegationPod.connect(delegatee).functions['register(address)'](delegatedShare.address);
+                await delegationPod.connect(delegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS);
                 expect(await delegationPod.registration(delegatee.address)).to.equal(delegatedShare.address);
             });
 
             it('should not registrate with already used token', async function () {
                 const { delegationPod } = await loadFixture(initContracts);
-                await delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
+                await delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName', 'TestTokenSymbol', MAX_FARM, constants.ZERO_ADDRESS);
                 const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
-                await expect(delegationPod.connect(newDelegatee).functions['register(address)'](delegatedShare.address))
+                await expect(delegationPod.connect(newDelegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS))
                     .to.be.revertedWithCustomError(delegationPod, 'AnotherDelegateeToken');
             });
 
             it('should not double registrate', async function () {
                 const { delegationPod } = await loadFixture(initContracts);
                 const delegatedShare = await DelegatedShare.connect(delegatee).deploy('TestTokenName', 'TestTokenSymbol', MAX_FARM);
-                await delegationPod.connect(delegatee).functions['register(address)'](delegatedShare.address);
-                await expect(delegationPod.connect(delegatee).functions['register(address)'](delegatedShare.address))
+                await delegationPod.connect(delegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS);
+                await expect(delegationPod.connect(delegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS))
                     .to.be.revertedWithCustomError(delegationPod, 'AlreadyRegistered');
             });
         });
@@ -133,12 +133,12 @@ describe('RewardableDelegationPod', function () {
 
             const delegatedShare = await DelegatedShare.connect(delegatee).deploy('TestTokenName1', 'TestTokenSymbol1', MAX_FARM);
             await delegatedShare.deployed();
-            await delegationPod.connect(delegatee).functions['register(address)'](delegatedShare.address);
+            await delegationPod.connect(delegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS);
             await delegatedShare.connect(delegatee).transferOwnership(delegationPod.address);
 
             const newDelegateeToken = await DelegatedShare.connect(newDelegatee).deploy('TestTokenName_2', 'TestTokenName_2', MAX_FARM);
             await newDelegateeToken.deployed();
-            await delegationPod.connect(newDelegatee).functions['register(address)'](newDelegateeToken.address);
+            await delegationPod.connect(newDelegatee).functions['register(address,address)'](newDelegateeToken.address, constants.ZERO_ADDRESS);
             await newDelegateeToken.connect(newDelegatee).transferOwnership(delegationPod.address);
 
             await delegationPod.delegate(delegatee.address);
