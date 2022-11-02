@@ -123,6 +123,16 @@ describe('RewardableDelegationPod', function () {
             await delegationPod.delegate(constants.ZERO_ADDRESS);
             expect(await delegationPod.delegated(addr1.address)).to.equal(constants.ZERO_ADDRESS);
         });
+
+        it('should add default farm for user when delegate', async function () {
+            const { delegationPod } = await loadFixture(initContracts);
+            const defaultFarm = delegationPod;
+            await delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName', 'TestTokenSymbol', MAX_FARM, defaultFarm.address);
+            const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
+            expect(await delegatedShare.hasPod(addr1.address, defaultFarm.address)).to.equal(false);
+            await delegationPod.delegate(delegatee.address);
+            expect(await delegatedShare.hasPod(addr1.address, defaultFarm.address)).to.equal(true);
+        });
     });
 
     describe('updateBalances', function () {
