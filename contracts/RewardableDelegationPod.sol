@@ -86,6 +86,7 @@ contract RewardableDelegationPod is BasicDelegationPod {
     }
 
     function _updateAccountingOnDelegate(address prevDelegatee, address delegatee, uint256 balance) internal virtual override {
+        super._updateAccountingOnDelegate(prevDelegatee, delegatee, balance);
         if (prevDelegatee != address(0)) {
             registration[prevDelegatee].burn(msg.sender, balance);
         }
