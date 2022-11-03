@@ -1,12 +1,12 @@
 {
     "name": "@1inch/delegating",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Set of contracts for delegating incentives",
     "homepage": "https://github.com/1inch/delegating#readme",
     "author": "1inch",
     "files": [
-        "./contracts/interfaces/*.sol",
-        "./contracts/*.sol"
+        "contracts/interfaces/*.sol",
+        "contracts/*.sol"
     ],
     "repository": {
         "type": "git",
