@@ -40,16 +40,24 @@ contract RewardableDelegationPod is BasicDelegationPod {
         }
     }
 
+    // we need to update registered shares safely and separately to make best effort of having consistent shares
     function updateBalances(address from, address to, uint256 amount) public override {
         super.updateBalances(from, to, amount);
 
-        if (to != address(0)) {
-            // Following call may be unsafe as we are already in safe call
-            registration[delegated[to]].mint(to, amount);
-        }
         if (from != address(0)) {
-            // Following call may be unsafe as we are already in safe call
-            registration[delegated[from]].burn(from, amount);
+            address _delegate = delegated[from];
+            if (_delegate != address(0)) {
+                // solhint-disable-next-line no-empty-blocks
+                try registration[_delegate].burn(from, amount) {} catch {}
+            }
+        }
+
+        if (to != address(0)) {
+            address _delegate = delegated[to];
+            if (_delegate != address(0)) {
+                // solhint-disable-next-line no-empty-blocks
+                try registration[_delegate].mint(to, amount) {} catch {}
+            }
         }
     }
 
@@ -78,7 +86,11 @@ contract RewardableDelegationPod is BasicDelegationPod {
     }
 
     function _updateAccountingOnDelegate(address prevDelegatee, address delegatee, uint256 balance) internal virtual override {
-        registration[prevDelegatee].burn(msg.sender, balance);
-        registration[delegatee].mint(msg.sender, balance);
+        if (prevDelegatee != address(0)) {
+            registration[prevDelegatee].burn(msg.sender, balance);
+        }
+        if (delegatee != address(0)) {
+            registration[delegatee].mint(msg.sender, balance);
+        }
     }
 }
