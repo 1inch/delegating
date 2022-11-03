@@ -76,4 +76,9 @@ contract RewardableDelegationPod is BasicDelegationPod {
     function setDefaultFarm(address farm) external onlyRegistered {
         defaultFarms[msg.sender] = farm;
     }
+
+    function _updateAccountingOnDelegate(address prevDelegatee, address delegatee, uint256 balance) internal virtual override {
+        registration[prevDelegatee].burn(msg.sender, balance);
+        registration[delegatee].mint(msg.sender, balance);
+    }
 }

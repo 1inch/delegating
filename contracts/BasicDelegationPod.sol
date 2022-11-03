@@ -22,8 +22,7 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
         if (prevDelegatee != delegatee) {
             uint256 balance = IERC20Pods(token).podBalanceOf(address(this), msg.sender);
             if (balance > 0) {
-                _burn(prevDelegatee, balance);
-                _mint(delegatee, balance);
+                _updateAccountingOnDelegate(prevDelegatee, delegatee, balance);
             }
             emit Delegate(msg.sender, delegatee);
             delegated[msg.sender] = delegatee;
@@ -47,6 +46,11 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
             _burn(fromDelegatee, amount);
             _mint(toDelegatee, amount);
         }
+    }
+
+    function _updateAccountingOnDelegate(address prevDelegatee, address delegatee, uint256 balance) internal virtual {
+        _burn(prevDelegatee, balance);
+        _mint(delegatee, balance);
     }
 
     // ERC20 overrides
