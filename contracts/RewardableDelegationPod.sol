@@ -62,20 +62,20 @@ contract RewardableDelegationPod is BasicDelegationPod {
     }
 
     function register(string memory name, string memory symbol, uint256 maxUserFarms, address defaultFarm)
-        external onlyNotRegistered returns(IDelegatedShare token)
+        external onlyNotRegistered returns(IDelegatedShare shareToken)
     {
-        token = new DelegatedShare(name, symbol, maxUserFarms);
-        registration[msg.sender] = token;
-        _delegateeTokens.add(address(token));
+        shareToken = new DelegatedShare(name, symbol, maxUserFarms);
+        registration[msg.sender] = IDelegatedShare(shareToken);
+        _delegateeTokens.add(address(shareToken));
         if (defaultFarm != address(0)) {
             defaultFarms[msg.sender] = defaultFarm;
         }
     }
 
     /// @dev owner of IDelegatedShare should be set to this contract
-    function register(IDelegatedShare token, address defaultFarm) external onlyNotRegistered {
-        if (!_delegateeTokens.add(address(token))) revert AnotherDelegateeToken();
-        registration[msg.sender] = token;
+    function register(IDelegatedShare shareToken, address defaultFarm) external onlyNotRegistered {
+        if (!_delegateeTokens.add(address(shareToken))) revert AnotherDelegateeToken();
+        registration[msg.sender] = shareToken;
         if (defaultFarm != address(0)) {
             defaultFarms[msg.sender] = defaultFarm;
         }
