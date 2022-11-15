@@ -10,6 +10,14 @@
     "@1inch/solidity-utils" "2.2.0"
     "@openzeppelin/contracts" "4.7.3"
 
+"@1inch/erc20-pods@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@1inch/erc20-pods/-/erc20-pods-0.0.7.tgz#6d37e8b542868b256d0e37df229a4c8e6e146cf3"
+  integrity sha512-U985QOShAn/jRw1SxrNA3pMdGiQycLLsqZkEtEnWeqJk5JdHCv7dwoEV9lG9fh++4GU2n6ZlxekdqS/RHl6D0g==
+  dependencies:
+    "@1inch/solidity-utils" "2.2.2"
+    "@openzeppelin/contracts" "4.7.3"
+
 "@1inch/farming@1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@1inch/farming/-/farming-1.1.0.tgz#8e41ad0fadeb282985a1a69c79d6597a19b59139"
@@ -23,6 +31,19 @@
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@1inch/solidity-utils/-/solidity-utils-2.2.0.tgz#5f35e306975b9cf26b271d39860ba5d1b15d2d98"
   integrity sha512-U5nirVTXWnS0h1D49sL0Q8qf+5NJl7b50uk0kHt6dTrVdVaI92wjxywibd/N9R3ZsyqFXHcuCQoiER4+dcIWHg==
+  dependencies:
+    "@metamask/eth-sig-util" "4.0.1"
+    "@nomicfoundation/hardhat-network-helpers" "1.0.6"
+    "@nomiclabs/hardhat-ethers" "2.1.1"
+    "@openzeppelin/contracts" "4.7.3"
+    ethereumjs-util "7.1.5"
+    ethers "5.7.1"
+    hardhat "2.11.2"
+
+"@1inch/solidity-utils@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@1inch/solidity-utils/-/solidity-utils-2.2.2.tgz#3c7165b0131426a11abd35a556fa244a5ac0c59b"
+  integrity sha512-nO65pP6fgbc0RUbKaI7PrqZdM20KjK6FONrh3iOf5o5y+iH/kf7njcUwXSU9hEB/UmnTUD0lr2LeGOwiCVDCkg==
   dependencies:
     "@metamask/eth-sig-util" "4.0.1"
     "@nomicfoundation/hardhat-network-helpers" "1.0.6"
