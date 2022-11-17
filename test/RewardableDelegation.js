@@ -89,8 +89,14 @@ describe('RewardableDelegationPod', function () {
         it('should set default farm', async function () {
             const { delegationPod } = await loadFixture(initContractsAndRegister);
             expect(await delegationPod.defaultFarms(delegatee.address)).to.equal(constants.ZERO_ADDRESS);
-            await delegationPod.connect(delegatee).setDefaultFarm(constants.EEE_ADDRESS);
-            expect(await delegationPod.defaultFarms(delegatee.address)).to.equal(constants.EEE_ADDRESS);
+
+            const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
+            const RewardableDelegationPod = await ethers.getContractFactory('RewardableDelegationPod');
+            const farmPod = await RewardableDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address);
+            await farmPod.deployed();
+            await delegationPod.connect(delegatee).setDefaultFarm(farmPod.address);
+
+            expect(await delegationPod.defaultFarms(delegatee.address)).to.equal(farmPod.address);
         });
 
         it('should not set default farm non-registered user', async function () {
@@ -126,12 +132,18 @@ describe('RewardableDelegationPod', function () {
 
         it('should add default farm for user when delegate', async function () {
             const { delegationPod } = await loadFixture(initContracts);
-            const defaultFarm = delegationPod;
-            await delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName', 'TestTokenSymbol', MAX_FARM, defaultFarm.address);
+
+            await delegationPod.connect(delegatee).functions['register(string,string,uint256,address)']('TestTokenName', 'TestTokenSymbol', MAX_FARM, constants.ZERO_ADDRESS);
             const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
-            expect(await delegatedShare.hasPod(addr1.address, defaultFarm.address)).to.equal(false);
+
+            const RewardableDelegationPod = await ethers.getContractFactory('RewardableDelegationPod');
+            const farmPod = await RewardableDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address);
+            await farmPod.deployed();
+            await delegationPod.connect(delegatee).setDefaultFarm(farmPod.address);
+
+            expect(await delegatedShare.hasPod(addr1.address, farmPod.address)).to.equal(false);
             await delegationPod.delegate(delegatee.address);
-            expect(await delegatedShare.hasPod(addr1.address, defaultFarm.address)).to.equal(true);
+            expect(await delegatedShare.hasPod(addr1.address, farmPod.address)).to.equal(true);
         });
     });
 
