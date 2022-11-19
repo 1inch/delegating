@@ -13,6 +13,9 @@ contract RewardableDelegationPod is BasicDelegationPod {
     error NotRegisteredDelegatee();
     error AlreadyRegistered();
     error AnotherDelegateeToken();
+    error DefaultFarmTokenMismatch();
+
+    event DefaultFarmSet(address defaultFarm);
 
     mapping(address => IDelegatedShare) public registration;
     mapping(address => address) public defaultFarms;
@@ -61,15 +64,12 @@ contract RewardableDelegationPod is BasicDelegationPod {
         }
     }
 
-    function register(string memory name, string memory symbol, uint256 maxUserFarms, address defaultFarm)
+    function register(string memory name, string memory symbol, uint256 maxUserFarms)
         external onlyNotRegistered returns(IDelegatedShare shareToken)
     {
         shareToken = new DelegatedShare(name, symbol, maxUserFarms);
         registration[msg.sender] = IDelegatedShare(shareToken);
         _delegateeTokens.add(address(shareToken));
-        if (defaultFarm != address(0)) {
-            defaultFarms[msg.sender] = defaultFarm;
-        }
     }
 
     /// @dev owner of IDelegatedShare should be set to this contract
@@ -77,12 +77,16 @@ contract RewardableDelegationPod is BasicDelegationPod {
         if (!_delegateeTokens.add(address(shareToken))) revert AnotherDelegateeToken();
         registration[msg.sender] = shareToken;
         if (defaultFarm != address(0)) {
+            if (Pod(defaultFarm).token() != address(shareToken)) revert DefaultFarmTokenMismatch();
             defaultFarms[msg.sender] = defaultFarm;
+            emit DefaultFarmSet(defaultFarm);
         }
     }
 
     function setDefaultFarm(address farm) external onlyRegistered {
+        if (farm != address(0) && Pod(farm).token() != address(registration[msg.sender])) revert DefaultFarmTokenMismatch();
         defaultFarms[msg.sender] = farm;
+        emit DefaultFarmSet(farm);
     }
 
     function _updateAccountingOnDelegate(address prevDelegatee, address delegatee, uint256 balance) internal virtual override {
