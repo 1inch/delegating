@@ -34,15 +34,15 @@ describe('BasicDelegationPod', function () {
     }
 
     describe('delegate', function () {
-        it('should set delegate and emit Delegate event', async function () {
+        it('should set delegate and emit Delegated event', async function () {
             const { delegationPod } = await loadFixture(initContracts);
             const tx = await delegationPod.delegate(delegatee.address);
             const receipt = await tx.wait();
             expect(await delegationPod.delegated(addr1.address)).to.equal(delegatee.address);
-            expect(receipt.events[0].event).to.equal('Delegate');
+            expect(receipt.events[0].event).to.equal('Delegated');
         });
 
-        it('should does nothing and does not emit Delegate event when the same delegatee', async function () {
+        it('should does nothing and does not emit Delegated event when the same delegatee', async function () {
             const { delegationPod } = await loadFixture(initContracts);
             await delegationPod.delegate(delegatee.address);
             const tx = await delegationPod.delegate(delegatee.address);

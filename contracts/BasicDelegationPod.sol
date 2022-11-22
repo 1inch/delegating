@@ -24,7 +24,7 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
             if (balance > 0) {
                 _updateAccountingOnDelegate(prevDelegatee, delegatee, balance);
             }
-            emit Delegate(msg.sender, delegatee);
+            emit Delegated(msg.sender, delegatee);
             delegated[msg.sender] = delegatee;
         }
     }

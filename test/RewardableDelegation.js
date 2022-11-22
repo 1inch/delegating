@@ -108,12 +108,12 @@ describe('RewardableDelegationPod', function () {
     });
 
     describe('delegate', function () {
-        it('should set delegate and emit Delegate event', async function () {
+        it('should set delegate and emit Delegated event', async function () {
             const { delegationPod } = await loadFixture(initContractsAndRegister);
             const tx = await delegationPod.delegate(delegatee.address);
             const receipt = await tx.wait();
             expect(await delegationPod.delegated(addr1.address)).to.equal(delegatee.address);
-            expect(receipt.events[0].event).to.equal('Delegate');
+            expect(receipt.events[0].event).to.equal('Delegated');
         });
 
         it('should not delegate not registered delegatee', async function () {
