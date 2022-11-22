@@ -89,8 +89,9 @@ contract RewardableDelegationPod is BasicDelegationPod {
         emit DefaultFarmSet(farm);
     }
 
-    function _updateAccountingOnDelegate(address prevDelegatee, address delegatee, uint256 balance) internal virtual override {
-        super._updateAccountingOnDelegate(prevDelegatee, delegatee, balance);
+    function _transfer(address prevDelegatee, address delegatee, uint256 balance) internal virtual override {
+        super._transfer(prevDelegatee, delegatee, balance);
+
         if (prevDelegatee != address(0)) {
             registration[prevDelegatee].burn(msg.sender, balance);
         }
