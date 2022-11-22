@@ -33,15 +33,15 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
         _transfer(delegated[from], delegated[to], amount);
     }
 
-    function _transfer(address prevDelegatee, address delegatee, uint256 balance) internal override virtual {
-        if (prevDelegatee != address(0) && delegatee != address(0)) {
-            if (prevDelegatee != delegatee) {
-                super._transfer(prevDelegatee, delegatee, balance);
+    function _transfer(address from, address to, uint256 amount) internal override virtual {
+        if (from != to && amount > 0) {
+            if (from != address(0) && to != address(0)) {
+                super._transfer(from, to, amount);
+            } else if (from != address(0)) {
+                super._burn(from, amount);
+            } else if (to != address(0)) {
+                super._mint(to, amount);
             }
-        } else if (prevDelegatee != address(0)) {
-            _burn(prevDelegatee, balance);
-        } else if (delegatee != address(0)) {
-            _mint(delegatee, balance);
         }
     }
 
