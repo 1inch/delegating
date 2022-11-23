@@ -9,7 +9,8 @@ import "@1inch/erc20-pods/contracts/Pod.sol";
 import "./interfaces/IDelegationPod.sol";
 
 contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
-    error MethodDisabled();
+    error ApproveDisabled();
+    error TransferDisabled();
 
     mapping(address => address) public delegated;
 
@@ -67,15 +68,23 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
         }
     }
 
-    function transfer(address /* to */, uint256 /* amount */) public virtual override(IERC20, ERC20) returns (bool) {
-        revert MethodDisabled();
+    function transfer(address /* to */, uint256 /* amount */) public pure override(IERC20, ERC20) returns (bool) {
+        revert TransferDisabled();
     }
 
-    function transferFrom(address /* from */, address /* to */, uint256 /* amount */) public virtual override(IERC20, ERC20) returns (bool) {
-        revert MethodDisabled();
+    function transferFrom(address /* from */, address /* to */, uint256 /* amount */) public pure override(IERC20, ERC20) returns (bool) {
+        revert TransferDisabled();
     }
 
-    function approve(address /* spender */, uint256 /* amount */) public virtual override(IERC20, ERC20) returns (bool) {
-        revert MethodDisabled();
+    function approve(address /* spender */, uint256 /* amount */) public pure override(ERC20, IERC20) returns (bool) {
+        revert ApproveDisabled();
+    }
+
+    function increaseAllowance(address /* spender */, uint256 /* addedValue */) public pure override returns (bool) {
+        revert ApproveDisabled();
+    }
+
+    function decreaseAllowance(address /* spender */, uint256 /* subtractedValue */) public pure override returns (bool) {
+        revert ApproveDisabled();
     }
 }
