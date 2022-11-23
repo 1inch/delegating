@@ -153,35 +153,29 @@ describe('RewardableDelegationPod', function () {
             await erc20Pods.mint(addr1.address, amount);
             await erc20Pods.mint(addr2.address, amount * 2n);
 
-            const delegatedShare = await DelegatedShare.connect(delegatee).deploy('TestTokenName1', 'TestTokenSymbol1', MAX_FARM);
-            await delegatedShare.deployed();
-            await delegationPod.connect(delegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS);
-            await delegatedShare.connect(delegatee).transferOwnership(delegationPod.address);
+            await delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName1', 'TestTokenSymbol1', MAX_FARM);
+            const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
 
-            const newDelegateeToken = await DelegatedShare.connect(newDelegatee).deploy('TestTokenName_2', 'TestTokenName_2', MAX_FARM);
-            await newDelegateeToken.deployed();
-            await delegationPod.connect(newDelegatee).functions['register(address,address)'](newDelegateeToken.address, constants.ZERO_ADDRESS);
-            await newDelegateeToken.connect(newDelegatee).transferOwnership(delegationPod.address);
+            await delegationPod.connect(newDelegatee).functions['register(string,string,uint256)']('TestTokenName2', 'TestTokenSymbol2', MAX_FARM);
 
             await delegationPod.delegate(delegatee.address);
-            await delegationPod.connect(addr2).delegate(newDelegatee.address);
 
-            return { erc20Pods, delegationPod, delegatedShare, newDelegateeToken, amount };
+            return { erc20Pods, delegationPod, delegatedShare, amount };
         };
 
         it('`address(0) -> addr1` should mint DelegatedShare for addr1', async function () {
             const { erc20Pods, delegationPod, delegatedShare, amount } = await loadFixture(initContractsAndTokens);
-            const balanceBefore = await delegatedShare.balanceOf(addr1.address);
+            expect(await delegatedShare.balanceOf(addr1.address)).to.equal(0);
             await erc20Pods.addPod(delegationPod.address);
-            expect(await delegatedShare.balanceOf(addr1.address)).to.equal(balanceBefore.add(amount));
+            expect(await delegatedShare.balanceOf(addr1.address)).to.equal(amount);
         });
 
         it('`addr1 -> address(0)` should burn DelegatedShare for addr1', async function () {
             const { erc20Pods, delegationPod, delegatedShare, amount } = await loadFixture(initContractsAndTokens);
             await erc20Pods.addPod(delegationPod.address);
-            const balanceBefore = await delegatedShare.balanceOf(addr1.address);
+            expect(await delegatedShare.balanceOf(addr1.address)).to.equal(amount);
             await erc20Pods.removePod(delegationPod.address);
-            expect(await delegatedShare.balanceOf(addr1.address)).to.equal(balanceBefore.sub(amount));
+            expect(await delegatedShare.balanceOf(addr1.address)).to.equal(0);
         });
 
         it('`addr1 -> addr2` should change their DelegatedShare balances', async function () {
