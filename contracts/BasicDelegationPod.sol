@@ -25,27 +25,29 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
             emit Delegated(msg.sender, delegatee);
             uint256 balance = IERC20Pods(token).podBalanceOf(address(this), msg.sender);
             if (balance > 0) {
-                _transfer(prevDelegatee, delegatee, balance);
+                _updateBalances(msg.sender, msg.sender, prevDelegatee, delegatee, balance);
             }
         }
     }
 
     function updateBalances(address from, address to, uint256 amount) public virtual onlyToken {
-        _transfer(
+        _updateBalances(
+            from,
+            to,
             from == address(0) ? address(0) : delegated[from],
             to == address(0) ? address(0) : delegated[to],
             amount
         );
     }
 
-    function _transfer(address from, address to, uint256 amount) internal override virtual {
-        if (from != to && amount > 0) {
-            if (from == address(0)) {
-                _mint(to, amount);
-            } else if (to == address(0)) {
-                _burn(from, amount);
+    function _updateBalances(address /* from */, address /* to */, address fromDelegatee, address toDelegatee, uint256 amount) internal virtual {
+        if (fromDelegatee != toDelegatee && amount > 0) {
+            if (fromDelegatee == address(0)) {
+                _mint(toDelegatee, amount);
+            } else if (toDelegatee == address(0)) {
+                _burn(fromDelegatee, amount);
             } else {
-                super._transfer(from, to, amount);
+                _transfer(fromDelegatee, toDelegatee, amount);
             }
         }
     }

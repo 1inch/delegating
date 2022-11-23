@@ -43,27 +43,6 @@ contract RewardableDelegationPod is BasicDelegationPod {
         }
     }
 
-    // we need to update registered shares safely and separately to make best effort of having consistent shares
-    function updateBalances(address from, address to, uint256 amount) public override {
-        super.updateBalances(from, to, amount);
-
-        if (from != address(0)) {
-            address _delegate = delegated[from];
-            if (_delegate != address(0)) {
-                // solhint-disable-next-line no-empty-blocks
-                try registration[_delegate].burn(from, amount) {} catch {}
-            }
-        }
-
-        if (to != address(0)) {
-            address _delegate = delegated[to];
-            if (_delegate != address(0)) {
-                // solhint-disable-next-line no-empty-blocks
-                try registration[_delegate].mint(to, amount) {} catch {}
-            }
-        }
-    }
-
     function register(string memory name, string memory symbol, uint256 maxUserFarms)
         external onlyNotRegistered returns(IDelegatedShare shareToken)
     {
@@ -89,14 +68,17 @@ contract RewardableDelegationPod is BasicDelegationPod {
         emit DefaultFarmSet(farm);
     }
 
-    function _transfer(address prevDelegatee, address delegatee, uint256 balance) internal virtual override {
-        super._transfer(prevDelegatee, delegatee, balance);
+    function _updateBalances(address from, address to, address fromDelegatee, address toDelegatee, uint256 amount) internal virtual override {
+        super._updateBalances(from, to, fromDelegatee, toDelegatee, amount);
 
-        if (prevDelegatee != address(0)) {
-            registration[prevDelegatee].burn(msg.sender, balance);
+        // TODO: make try-catch safe via asm call
+        if (fromDelegatee != address(0)) {
+            // solhint-disable-next-line no-empty-blocks
+            try registration[fromDelegatee].burn(from, amount) {} catch {}
         }
-        if (delegatee != address(0)) {
-            registration[delegatee].mint(msg.sender, balance);
+        if (toDelegatee != address(0)) {
+            // solhint-disable-next-line no-empty-blocks
+            try registration[toDelegatee].mint(to, amount) {} catch {}
         }
     }
 }
