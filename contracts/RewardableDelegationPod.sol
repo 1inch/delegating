@@ -71,14 +71,21 @@ contract RewardableDelegationPod is BasicDelegationPod {
     function _updateBalances(address from, address to, address fromDelegatee, address toDelegatee, uint256 amount) internal virtual override {
         super._updateBalances(from, to, fromDelegatee, toDelegatee, amount);
 
-        // TODO: make try-catch safe via asm call
         if (fromDelegatee != address(0)) {
-            // solhint-disable-next-line no-empty-blocks
-            try registration[fromDelegatee].burn(from, amount) {} catch {}
+            _changeShare(registration[fromDelegatee], IDelegatedShare.burn.selector, from, amount);
         }
         if (toDelegatee != address(0)) {
-            // solhint-disable-next-line no-empty-blocks
-            try registration[toDelegatee].mint(to, amount) {} catch {}
+            _changeShare(registration[toDelegatee], IDelegatedShare.mint.selector, to, amount);
+        }
+    }
+
+    function _changeShare(IDelegatedShare share, bytes4 selector, address account, uint256 amount) private {
+        assembly {
+            let ptr := mload(0x40)
+            mstore(ptr, selector)
+            mstore(add(ptr, 0x04), account)
+            mstore(add(ptr, 0x24), amount)
+            pop(call(gas(), share, 0, ptr, 0x44, 0, 0))
         }
     }
 }
