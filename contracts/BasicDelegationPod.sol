@@ -20,12 +20,12 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
     function delegate(address delegatee) public virtual {
         address prevDelegatee = delegated[msg.sender];
         if (prevDelegatee != delegatee) {
+            delegated[msg.sender] = delegatee;
+            emit Delegated(msg.sender, delegatee);
             uint256 balance = IERC20Pods(token).podBalanceOf(address(this), msg.sender);
             if (balance > 0) {
                 _updateAccountingOnDelegate(prevDelegatee, delegatee, balance);
             }
-            emit Delegated(msg.sender, delegatee);
-            delegated[msg.sender] = delegatee;
         }
     }
 
