@@ -122,19 +122,19 @@ describe('BasicDelegationPod', function () {
         it('should not transfer', async function () {
             const { delegationPod } = await loadFixture(initContracts);
             await expect(delegationPod.transfer(addr2.address, ether('1')))
-                .to.be.revertedWithCustomError(delegationPod, 'MethodDisabled');
+                .to.be.revertedWithCustomError(delegationPod, 'TransferDisabled');
         });
 
         it('should not transferFrom', async function () {
             const { delegationPod } = await loadFixture(initContracts);
             await expect(delegationPod.transferFrom(addr2.address, delegatee.address, ether('1')))
-                .to.be.revertedWithCustomError(delegationPod, 'MethodDisabled');
+                .to.be.revertedWithCustomError(delegationPod, 'TransferDisabled');
         });
 
         it('should not approve', async function () {
             const { delegationPod } = await loadFixture(initContracts);
             await expect(delegationPod.approve(addr2.address, ether('1')))
-                .to.be.revertedWithCustomError(delegationPod, 'MethodDisabled');
+                .to.be.revertedWithCustomError(delegationPod, 'ApproveDisabled');
         });
     });
 });
