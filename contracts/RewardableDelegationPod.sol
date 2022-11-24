@@ -43,27 +43,6 @@ contract RewardableDelegationPod is BasicDelegationPod {
         }
     }
 
-    // we need to update registered shares safely and separately to make best effort of having consistent shares
-    function updateBalances(address from, address to, uint256 amount) public override {
-        super.updateBalances(from, to, amount);
-
-        if (from != address(0)) {
-            address _delegate = delegated[from];
-            if (_delegate != address(0)) {
-                // solhint-disable-next-line no-empty-blocks
-                try registration[_delegate].burn(from, amount) {} catch {}
-            }
-        }
-
-        if (to != address(0)) {
-            address _delegate = delegated[to];
-            if (_delegate != address(0)) {
-                // solhint-disable-next-line no-empty-blocks
-                try registration[_delegate].mint(to, amount) {} catch {}
-            }
-        }
-    }
-
     function register(string memory name, string memory symbol, uint256 maxUserFarms)
         external onlyNotRegistered returns(IDelegatedShare shareToken)
     {
@@ -89,13 +68,25 @@ contract RewardableDelegationPod is BasicDelegationPod {
         emit DefaultFarmSet(farm);
     }
 
-    function _updateAccountingOnDelegate(address prevDelegatee, address delegatee, uint256 balance) internal virtual override {
-        super._updateAccountingOnDelegate(prevDelegatee, delegatee, balance);
-        if (prevDelegatee != address(0)) {
-            registration[prevDelegatee].burn(msg.sender, balance);
+    function _updateBalances(address from, address to, address fromDelegatee, address toDelegatee, uint256 amount) internal virtual override {
+        super._updateBalances(from, to, fromDelegatee, toDelegatee, amount);
+
+        if (fromDelegatee != address(0)) {
+            _changeShare(registration[fromDelegatee], IDelegatedShare.burn.selector, from, amount);
         }
-        if (delegatee != address(0)) {
-            registration[delegatee].mint(msg.sender, balance);
+        if (toDelegatee != address(0)) {
+            _changeShare(registration[toDelegatee], IDelegatedShare.mint.selector, to, amount);
+        }
+    }
+
+    function _changeShare(IDelegatedShare share, bytes4 selector, address account, uint256 amount) private {
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            let ptr := mload(0x40)
+            mstore(ptr, selector)
+            mstore(add(ptr, 0x04), account)
+            mstore(add(ptr, 0x24), amount)
+            pop(call(gas(), share, 0, ptr, 0x44, 0, 0))
         }
     }
 }

@@ -25,48 +25,34 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
             emit Delegated(msg.sender, delegatee);
             uint256 balance = IERC20Pods(token).podBalanceOf(address(this), msg.sender);
             if (balance > 0) {
-                _updateAccountingOnDelegate(prevDelegatee, delegatee, balance);
+                _updateBalances(msg.sender, msg.sender, prevDelegatee, delegatee, balance);
             }
         }
     }
 
     function updateBalances(address from, address to, uint256 amount) public virtual onlyToken {
-        if (from == address(0)) {
-            _mint(delegated[to], amount);
-            return;
-        }
-
-        if (to == address(0)) {
-            _burn(delegated[from], amount);
-            return;
-        }
-
-        address fromDelegatee = delegated[from];
-        address toDelegatee = delegated[to];
-        if (fromDelegatee != toDelegatee) {
-            _burn(fromDelegatee, amount);
-            _mint(toDelegatee, amount);
-        }
+        _updateBalances(
+            from,
+            to,
+            from == address(0) ? address(0) : delegated[from],
+            to == address(0) ? address(0) : delegated[to],
+            amount
+        );
     }
 
-    function _updateAccountingOnDelegate(address prevDelegatee, address delegatee, uint256 balance) internal virtual {
-        _burn(prevDelegatee, balance);
-        _mint(delegatee, balance);
+    function _updateBalances(address /* from */, address /* to */, address fromDelegatee, address toDelegatee, uint256 amount) internal virtual {
+        if (fromDelegatee != toDelegatee && amount > 0) {
+            if (fromDelegatee == address(0)) {
+                _mint(toDelegatee, amount);
+            } else if (toDelegatee == address(0)) {
+                _burn(fromDelegatee, amount);
+            } else {
+                _transfer(fromDelegatee, toDelegatee, amount);
+            }
+        }
     }
 
     // ERC20 overrides
-
-    function _mint(address account, uint256 amount) internal virtual override {
-        if (account != address(0)) {
-            super._mint(account, amount);
-        }
-    }
-
-    function _burn(address account, uint256 amount) internal virtual override {
-        if (account != address(0)) {
-            super._burn(account, amount);
-        }
-    }
 
     function transfer(address /* to */, uint256 /* amount */) public pure override(IERC20, ERC20) returns (bool) {
         revert TransferDisabled();
