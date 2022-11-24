@@ -80,6 +80,7 @@ contract RewardableDelegationPod is BasicDelegationPod {
     }
 
     function _changeShare(IDelegatedShare share, bytes4 selector, address account, uint256 amount) private {
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             let ptr := mload(0x40)
             mstore(ptr, selector)
