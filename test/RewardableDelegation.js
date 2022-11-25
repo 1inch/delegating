@@ -4,12 +4,10 @@ const { ethers } = require('hardhat');
 
 describe('RewardableDelegationPod', function () {
     let addr1, addr2, delegatee, newDelegatee;
-    let DelegatedShare;
     const MAX_FARM = 5;
 
     before(async function () {
         [addr1, addr2, delegatee, newDelegatee] = await ethers.getSigners();
-        DelegatedShare = await ethers.getContractFactory('DelegatedShare');
     });
 
     async function initContracts () {
