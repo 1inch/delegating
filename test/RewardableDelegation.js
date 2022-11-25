@@ -57,32 +57,6 @@ describe('RewardableDelegationPod', function () {
                     .to.be.revertedWithCustomError(delegationPod, 'AlreadyRegistered');
             });
         });
-
-        describe('register(IDelegatedShare)', function () {
-            it('should registrate delegatee', async function () {
-                const { delegationPod } = await loadFixture(initContracts);
-                const delegatedShare = await DelegatedShare.connect(delegatee).deploy('TestTokenName', 'TestTokenSymbol', MAX_FARM);
-                await delegatedShare.deployed();
-                await delegationPod.connect(delegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS);
-                expect(await delegationPod.registration(delegatee.address)).to.equal(delegatedShare.address);
-            });
-
-            it('should not registrate with already used token', async function () {
-                const { delegationPod } = await loadFixture(initContracts);
-                await delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);
-                const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
-                await expect(delegationPod.connect(newDelegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS))
-                    .to.be.revertedWithCustomError(delegationPod, 'AnotherDelegateeToken');
-            });
-
-            it('should not double registrate', async function () {
-                const { delegationPod } = await loadFixture(initContracts);
-                const delegatedShare = await DelegatedShare.connect(delegatee).deploy('TestTokenName', 'TestTokenSymbol', MAX_FARM);
-                await delegationPod.connect(delegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS);
-                await expect(delegationPod.connect(delegatee).functions['register(address,address)'](delegatedShare.address, constants.ZERO_ADDRESS))
-                    .to.be.revertedWithCustomError(delegationPod, 'AlreadyRegistered');
-            });
-        });
     });
 
     describe('setDefaultFarm', function () {

@@ -2,24 +2,19 @@
 
 pragma solidity ^0.8.0;
 
-import "@1inch/solidity-utils/contracts/libraries/AddressSet.sol";
 import "./BasicDelegationPod.sol";
 import "./DelegatedShare.sol";
 import "./interfaces/IDelegatedShare.sol";
 
 contract RewardableDelegationPod is BasicDelegationPod {
-    using AddressSet for AddressSet.Data;
-
     error NotRegisteredDelegatee();
     error AlreadyRegistered();
-    error AnotherDelegateeToken();
     error DefaultFarmTokenMismatch();
 
     event DefaultFarmSet(address defaultFarm);
 
     mapping(address => IDelegatedShare) public registration;
     mapping(address => address) public defaultFarms;
-    AddressSet.Data private _delegateeTokens;
 
     modifier onlyRegistered {
         if (address(registration[msg.sender]) == address(0)) revert NotRegisteredDelegatee();
@@ -48,18 +43,6 @@ contract RewardableDelegationPod is BasicDelegationPod {
     {
         shareToken = new DelegatedShare(name, symbol, maxUserFarms);
         registration[msg.sender] = IDelegatedShare(shareToken);
-        _delegateeTokens.add(address(shareToken));
-    }
-
-    /// @dev owner of IDelegatedShare should be set to this contract
-    function register(IDelegatedShare shareToken, address defaultFarm) external onlyNotRegistered {
-        if (!_delegateeTokens.add(address(shareToken))) revert AnotherDelegateeToken();
-        registration[msg.sender] = shareToken;
-        if (defaultFarm != address(0)) {
-            if (Pod(defaultFarm).token() != address(shareToken)) revert DefaultFarmTokenMismatch();
-            defaultFarms[msg.sender] = defaultFarm;
-            emit DefaultFarmSet(defaultFarm);
-        }
     }
 
     function setDefaultFarm(address farm) external onlyRegistered {
