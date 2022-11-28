@@ -38,6 +38,18 @@ describe('RewardableDelegationPod', function () {
                 expect(await delegatedShare.symbol()).to.equal('TestTokenSymbol');
             });
 
+            it('should emit Register event', async function () {
+                const { delegationPod } = await loadFixture(initContracts);
+                await expect(
+                    delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM),
+                ).to.emit(
+                    delegationPod,
+                    'RegisterDelegatee',
+                ).withArgs(
+                    delegatee.address,
+                );
+            });
+
             it('should mint and burn DelegatedShare only ReawardableDelegation', async function () {
                 const { delegationPod } = await loadFixture(initContracts);
                 await delegationPod.connect(delegatee).functions['register(string,string,uint256)']('TestTokenName', 'TestTokenSymbol', MAX_FARM);

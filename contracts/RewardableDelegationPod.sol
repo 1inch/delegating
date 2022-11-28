@@ -4,14 +4,13 @@ pragma solidity ^0.8.0;
 
 import "./BasicDelegationPod.sol";
 import "./DelegatedShare.sol";
+import "./interfaces/IRewardableDelegationPod.sol";
 import "./interfaces/IDelegatedShare.sol";
 
-contract RewardableDelegationPod is BasicDelegationPod {
+contract RewardableDelegationPod is IRewardableDelegationPod, BasicDelegationPod {
     error NotRegisteredDelegatee();
     error AlreadyRegistered();
     error DefaultFarmTokenMismatch();
-
-    event DefaultFarmSet(address defaultFarm);
 
     mapping(address => IDelegatedShare) public registration;
     mapping(address => address) public defaultFarms;
@@ -29,7 +28,7 @@ contract RewardableDelegationPod is BasicDelegationPod {
     // solhint-disable-next-line no-empty-blocks
     constructor(string memory name_, string memory symbol_, address token) BasicDelegationPod(name_, symbol_, token) {}
 
-    function delegate(address delegatee) public override {
+    function delegate(address delegatee) public override(IDelegationPod, BasicDelegationPod) {
         IDelegatedShare delegatedShare = registration[delegatee];
         if (delegatee != address(0) && delegatedShare == IDelegatedShare(address(0))) revert NotRegisteredDelegatee();
         super.delegate(delegatee);
@@ -43,6 +42,7 @@ contract RewardableDelegationPod is BasicDelegationPod {
     {
         shareToken = new DelegatedShare(name, symbol, maxUserFarms);
         registration[msg.sender] = IDelegatedShare(shareToken);
+        emit RegisterDelegatee(msg.sender);
     }
 
     function setDefaultFarm(address farm) external onlyRegistered {
