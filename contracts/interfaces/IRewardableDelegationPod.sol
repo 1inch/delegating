@@ -10,5 +10,6 @@ interface IRewardableDelegationPod is IDelegationPod {
     event RegisterDelegatee(address delegatee);
 
     function register(string memory name, string memory symbol, uint256 maxUserFarms) external returns(IDelegatedShare shareToken);
+    function registration(address account) external returns(IDelegatedShare shareToken);
     function setDefaultFarm(address farm) external;
 }
