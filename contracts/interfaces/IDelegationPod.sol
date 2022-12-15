@@ -8,6 +8,6 @@ import "@1inch/erc20-pods/contracts/interfaces/IPod.sol";
 interface IDelegationPod is IPod, IERC20 {
     event Delegated(address account, address delegatee);
 
-    function delegated(address account) external view returns(address);
+    function delegated(address delegator) external view returns(address delegatee);
     function delegate(address delegatee) external;
 }
