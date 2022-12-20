@@ -41,7 +41,7 @@ contract RewardableDelegationPod is IRewardableDelegationPod, BasicDelegationPod
         external onlyNotRegistered returns(IDelegatedShare shareToken)
     {
         shareToken = new DelegatedShare(name, symbol, maxUserFarms);
-        registration[msg.sender] = IDelegatedShare(shareToken);
+        registration[msg.sender] = shareToken;
         emit RegisterDelegatee(msg.sender);
     }
 
