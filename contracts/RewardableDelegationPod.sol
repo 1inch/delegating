@@ -12,6 +12,9 @@ contract RewardableDelegationPod is IRewardableDelegationPod, BasicDelegationPod
     error AlreadyRegistered();
     error DefaultFarmTokenMismatch();
 
+    uint256 public immutable maxSharePods;
+    uint256 public immutable sharePodGasLimit;
+
     mapping(address => IDelegatedShare) public registration;
     mapping(address => address) public defaultFarms;
 
@@ -26,7 +29,10 @@ contract RewardableDelegationPod is IRewardableDelegationPod, BasicDelegationPod
     }
 
     // solhint-disable-next-line no-empty-blocks
-    constructor(string memory name_, string memory symbol_, address token) BasicDelegationPod(name_, symbol_, token) {}
+    constructor(string memory name_, string memory symbol_, address token_, uint256 maxSharePods_, uint256 sharePodGasLimit_) BasicDelegationPod(name_, symbol_, token_) {
+        maxSharePods = maxSharePods_;
+        sharePodGasLimit = sharePodGasLimit_;
+    }
 
     function delegate(address delegatee) public override(IDelegationPod, BasicDelegationPod) {
         IDelegatedShare delegatedShare = registration[delegatee];
@@ -37,10 +43,10 @@ contract RewardableDelegationPod is IRewardableDelegationPod, BasicDelegationPod
         }
     }
 
-    function register(string memory name, string memory symbol, uint256 maxUserFarms)
+    function register(string memory name, string memory symbol)
         external onlyNotRegistered returns(IDelegatedShare shareToken)
     {
-        shareToken = new DelegatedShare(name, symbol, maxUserFarms);
+        shareToken = new DelegatedShare(name, symbol, maxSharePods, sharePodGasLimit);
         registration[msg.sender] = shareToken;
         emit RegisterDelegatee(msg.sender);
     }

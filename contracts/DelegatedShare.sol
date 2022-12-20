@@ -10,13 +10,12 @@ contract DelegatedShare is IDelegatedShare, ERC20Pods, Ownable {
     error ApproveDisabled();
     error TransferDisabled();
 
-    uint256 private constant _POD_CALL_GAS_LIMIT = 100_000;
-
     constructor(
         string memory name,
         string memory symbol,
-        uint256 maxUserPods
-    ) ERC20(name, symbol) ERC20Pods(maxUserPods, _POD_CALL_GAS_LIMIT) {} // solhint-disable-line no-empty-blocks
+        uint256 maxUserPods,
+        uint256 podCallGasLimit
+    ) ERC20(name, symbol) ERC20Pods(maxUserPods, podCallGasLimit) {} // solhint-disable-line no-empty-blocks
 
     function addDefaultFarmIfNeeded(address account, address farm) external onlyOwner {
         if (!hasPod(account, farm)) {
