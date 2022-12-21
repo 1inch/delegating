@@ -14,8 +14,8 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
 
     mapping(address => address) public delegated;
 
-    constructor(string memory name_, string memory symbol_, address token)
-        ERC20(name_, symbol_) Pod(token)
+    constructor(string memory name_, string memory symbol_, address token_)
+        ERC20(name_, symbol_) Pod(token_)
     {}  // solhint-disable-line no-empty-blocks
 
     function delegate(address delegatee) public virtual {
