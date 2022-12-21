@@ -11,10 +11,10 @@ contract DelegatedShare is IDelegatedShare, ERC20Pods {
     error TransferDisabled();
     error NotOwner();
 
-    address immutable owner;
+    address immutable private _owner;
 
     modifier onlyOwner {
-        if (msg.sender != owner) revert NotOwner();
+        if (msg.sender != _owner) revert NotOwner();
         _;
     }
 
@@ -24,7 +24,7 @@ contract DelegatedShare is IDelegatedShare, ERC20Pods {
         uint256 maxUserPods,
         uint256 podCallGasLimit
     ) ERC20(name, symbol) ERC20Pods(maxUserPods, podCallGasLimit) {
-        owner = msg.sender;
+        _owner = msg.sender;
     }
 
     function addDefaultFarmIfNeeded(address account, address farm) external onlyOwner {
