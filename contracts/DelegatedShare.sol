@@ -6,16 +6,26 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@1inch/erc20-pods/contracts/ERC20Pods.sol";
 import "./interfaces/IDelegatedShare.sol";
 
-contract DelegatedShare is IDelegatedShare, ERC20Pods, Ownable {
+contract DelegatedShare is IDelegatedShare, ERC20Pods {
     error ApproveDisabled();
     error TransferDisabled();
+    error NotOwner();
+
+    address immutable owner;
+
+    modifier onlyOwner {
+        if (msg.sender != owner) revert NotOwner();
+        _;
+    }
 
     constructor(
         string memory name,
         string memory symbol,
         uint256 maxUserPods,
         uint256 podCallGasLimit
-    ) ERC20(name, symbol) ERC20Pods(maxUserPods, podCallGasLimit) {} // solhint-disable-line no-empty-blocks
+    ) ERC20(name, symbol) ERC20Pods(maxUserPods, podCallGasLimit) {
+        owner = msg.sender;
+    }
 
     function addDefaultFarmIfNeeded(address account, address farm) external onlyOwner {
         if (!hasPod(account, farm)) {
