@@ -29,7 +29,7 @@ contract RewardableDelegationPod is IRewardableDelegationPod, BasicDelegationPod
     }
 
     // solhint-disable-next-line no-empty-blocks
-    constructor(string memory name_, string memory symbol_, address token_, uint256 maxSharePods_, uint256 sharePodGasLimit_) BasicDelegationPod(name_, symbol_, token_) {
+    constructor(string memory name_, string memory symbol_, IERC20Pods token_, uint256 maxSharePods_, uint256 sharePodGasLimit_) BasicDelegationPod(name_, symbol_, token_) {
         maxSharePods = maxSharePods_;
         sharePodGasLimit = sharePodGasLimit_;
     }
@@ -52,7 +52,7 @@ contract RewardableDelegationPod is IRewardableDelegationPod, BasicDelegationPod
     }
 
     function setDefaultFarm(address farm) external onlyRegistered {
-        if (farm != address(0) && Pod(farm).token() != address(registration[msg.sender])) revert DefaultFarmTokenMismatch();
+        if (farm != address(0) && Pod(farm).token() != registration[msg.sender]) revert DefaultFarmTokenMismatch();
         defaultFarms[msg.sender] = farm;
         emit DefaultFarmSet(farm);
     }

@@ -14,7 +14,7 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
 
     mapping(address => address) public delegated;
 
-    constructor(string memory name_, string memory symbol_, address token_)
+    constructor(string memory name_, string memory symbol_, IERC20Pods token_)
         ERC20(name_, symbol_) Pod(token_)
     {}  // solhint-disable-line no-empty-blocks
 
@@ -30,7 +30,7 @@ contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
         }
     }
 
-    function updateBalances(address from, address to, uint256 amount) public virtual onlyToken {
+    function _updateBalances(address from, address to, uint256 amount) internal override {
         _updateBalances(
             from,
             to,
