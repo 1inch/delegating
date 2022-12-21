@@ -38,8 +38,9 @@ contract RewardableDelegationPod is IRewardableDelegationPod, BasicDelegationPod
         IDelegatedShare delegatedShare = registration[delegatee];
         if (delegatee != address(0) && delegatedShare == IDelegatedShare(address(0))) revert NotRegisteredDelegatee();
         super.delegate(delegatee);
-        if (defaultFarms[delegatee] != address(0)) {
-            delegatedShare.addDefaultFarmIfNeeded(msg.sender, defaultFarms[delegatee]);
+        address defaultFarm = defaultFarms[delegatee];
+        if (defaultFarm != address(0)) {
+            delegatedShare.addDefaultFarmIfNeeded(msg.sender, defaultFarm);
         }
     }
 
