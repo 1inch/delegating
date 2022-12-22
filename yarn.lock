@@ -2,13 +2,35 @@
 # yarn lockfile v1
 
 
-"@1inch/erc20-pods@0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@1inch/erc20-pods/-/erc20-pods-0.0.15.tgz#bfa09e0ee89603b67610fe4c72c6c643c9a4d8e8"
-  integrity sha512-vpQTwYRS2cf/eHpebk4JKEWUZzNhru8vlMDwvB8raIet27sUDZY7bI5Dru2Xsr1zgW4F+o7kWmUxyWEBwxRCiA==
+"@1inch/erc20-pods@0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@1inch/erc20-pods/-/erc20-pods-0.0.16.tgz#01973e1e770430e00f4aab04fa7015a32e820585"
+  integrity sha512-m1LGMmI875qX+PWBsD8xzhTLOsfZbSHLQw42Yq6QTYBAeBmUdzThknoVh2F5xFee3hiWifq5IYiWaYcismbZqA==
   dependencies:
     "@1inch/solidity-utils" "2.2.5"
     "@openzeppelin/contracts" "4.8.0"
+
+"@1inch/farming@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@1inch/farming/-/farming-1.2.2.tgz#54c6b80359b58698f2a05d5580265f6d4f61ec33"
+  integrity sha512-BoEhUn8JcBsIP2flOicv7/F4QC0iofSoIMbfIAbRF3cYjvpW1qh7K+7FZChBSUsOk9yqZzLLhZHFtK/YAJdu6w==
+  dependencies:
+    "@1inch/erc20-pods" "0.0.16"
+    "@1inch/solidity-utils" "2.2.2"
+    "@openzeppelin/contracts" "4.8.0"
+
+"@1inch/solidity-utils@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@1inch/solidity-utils/-/solidity-utils-2.2.2.tgz#3c7165b0131426a11abd35a556fa244a5ac0c59b"
+  integrity sha512-nO65pP6fgbc0RUbKaI7PrqZdM20KjK6FONrh3iOf5o5y+iH/kf7njcUwXSU9hEB/UmnTUD0lr2LeGOwiCVDCkg==
+  dependencies:
+    "@metamask/eth-sig-util" "4.0.1"
+    "@nomicfoundation/hardhat-network-helpers" "1.0.6"
+    "@nomiclabs/hardhat-ethers" "2.1.1"
+    "@openzeppelin/contracts" "4.7.3"
+    ethereumjs-util "7.1.5"
+    ethers "5.7.1"
+    hardhat "2.11.2"
 
 "@1inch/solidity-utils@2.2.5":
   version "2.2.5"

@@ -2,10 +2,11 @@ const { constants, expect, ether } = require('@1inch/solidity-utils');
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { ethers } = require('hardhat');
 
-describe('RewardableDelegationPod', function () {
+describe('FarmedDelegationPod', function () {
     let addr1, addr2, delegatee, newDelegatee;
     const MAX_SHARE_PODS = 3;
-    const SHARE_PODS_GASLIMIT = 100000;
+    const SHARE_PODS_GASLIMIT = 150000;
+    const ERC20_PODS_GASLIMIT = 500000;
 
     before(async function () {
         [addr1, addr2, delegatee, newDelegatee] = await ethers.getSigners();
@@ -13,10 +14,10 @@ describe('RewardableDelegationPod', function () {
 
     async function initContracts () {
         const Erc20PodsMock = await ethers.getContractFactory('ERC20PodsMock');
-        const erc20Pods = await Erc20PodsMock.deploy('ERC20PodsMock', 'EPM', 10);
+        const erc20Pods = await Erc20PodsMock.deploy('ERC20PodsMock', 'EPM', 5, ERC20_PODS_GASLIMIT);
         await erc20Pods.deployed();
-        const RewardableDelegationPod = await ethers.getContractFactory('RewardableDelegationPod');
-        const delegationPod = await RewardableDelegationPod.deploy('Rewardable', 'RWD', erc20Pods.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
+        const FarmedDelegationPod = await ethers.getContractFactory('FarmedDelegationPod');
+        const delegationPod = await FarmedDelegationPod.deploy('FarmedDelegationPod', 'FDP', erc20Pods.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
         await delegationPod.deployed();
         const amount = ether('1');
         return { erc20Pods, delegationPod, amount };
@@ -73,11 +74,10 @@ describe('RewardableDelegationPod', function () {
     describe('setDefaultFarm', function () {
         it('should set default farm', async function () {
             const { delegationPod } = await loadFixture(initContractsAndRegister);
-            expect(await delegationPod.defaultFarms(delegatee.address)).to.equal(constants.ZERO_ADDRESS);
 
             const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
-            const RewardableDelegationPod = await ethers.getContractFactory('RewardableDelegationPod');
-            const farmPod = await RewardableDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
+            const FarmedDelegationPod = await ethers.getContractFactory('FarmedDelegationPod');
+            const farmPod = await FarmedDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
             await farmPod.deployed();
             await delegationPod.connect(delegatee).setDefaultFarm(farmPod.address);
 
@@ -89,6 +89,21 @@ describe('RewardableDelegationPod', function () {
             expect(await delegationPod.defaultFarms(newDelegatee.address)).to.equal(constants.ZERO_ADDRESS);
             await expect(delegationPod.connect(newDelegatee).setDefaultFarm(constants.EEE_ADDRESS))
                 .to.be.revertedWithCustomError(delegationPod, 'NotRegisteredDelegatee');
+        });
+
+        it('should add default farm for user when delegate', async function () {
+            const { delegationPod } = await loadFixture(initContractsAndRegister);
+
+            const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
+
+            const FarmedDelegationPod = await ethers.getContractFactory('FarmedDelegationPod');
+            const farmPod = await FarmedDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
+            await farmPod.deployed();
+            await delegationPod.connect(delegatee).setDefaultFarm(farmPod.address);
+
+            expect(await delegatedShare.hasPod(addr1.address, farmPod.address)).to.equal(false);
+            await delegationPod.delegate(delegatee.address);
+            expect(await delegatedShare.hasPod(addr1.address, farmPod.address)).to.equal(true);
         });
     });
 
@@ -113,22 +128,6 @@ describe('RewardableDelegationPod', function () {
             expect(await delegationPod.delegated(addr1.address)).to.equal(delegatee.address);
             await delegationPod.delegate(constants.ZERO_ADDRESS);
             expect(await delegationPod.delegated(addr1.address)).to.equal(constants.ZERO_ADDRESS);
-        });
-
-        it('should add default farm for user when delegate', async function () {
-            const { delegationPod } = await loadFixture(initContracts);
-
-            await delegationPod.connect(delegatee).functions['register(string,string)']('TestTokenName', 'TestTokenSymbol');
-            const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
-
-            const RewardableDelegationPod = await ethers.getContractFactory('RewardableDelegationPod');
-            const farmPod = await RewardableDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
-            await farmPod.deployed();
-            await delegationPod.connect(delegatee).setDefaultFarm(farmPod.address);
-
-            expect(await delegatedShare.hasPod(addr1.address, farmPod.address)).to.equal(false);
-            await delegationPod.delegate(delegatee.address);
-            expect(await delegatedShare.hasPod(addr1.address, farmPod.address)).to.equal(true);
         });
     });
 

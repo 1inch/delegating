@@ -8,7 +8,7 @@ import "@1inch/erc20-pods/contracts/Pod.sol";
 
 import "./interfaces/IDelegationPod.sol";
 
-contract BasicDelegationPod is IDelegationPod, Pod, ERC20 {
+contract DelegationPod is IDelegationPod, Pod, ERC20 {
     error ApproveDisabled();
     error TransferDisabled();
 

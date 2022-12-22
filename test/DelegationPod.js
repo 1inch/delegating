@@ -2,8 +2,9 @@ const { expect, ether } = require('@1inch/solidity-utils');
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { ethers } = require('hardhat');
 
-describe('BasicDelegationPod', function () {
+describe('DelegationPod', function () {
     let addr1, addr2, delegatee, newDelegatee;
+    const ERC20_PODS_GASLIMIT = 500000;
 
     before(async function () {
         [addr1, addr2, delegatee, newDelegatee] = await ethers.getSigners();
@@ -11,10 +12,10 @@ describe('BasicDelegationPod', function () {
 
     async function initContracts () {
         const Erc20PodsMock = await ethers.getContractFactory('ERC20PodsMock');
-        const erc20Pods = await Erc20PodsMock.deploy('ERC20PodsMock', 'EPM', 10);
+        const erc20Pods = await Erc20PodsMock.deploy('ERC20PodsMock', 'EPM', 5, ERC20_PODS_GASLIMIT);
         await erc20Pods.deployed();
-        const BasicDelegationPod = await ethers.getContractFactory('BasicDelegationPod');
-        const delegationPod = await BasicDelegationPod.deploy('basic1INCH', 'basic1INCH', erc20Pods.address);
+        const DelegationPod = await ethers.getContractFactory('DelegationPod');
+        const delegationPod = await DelegationPod.deploy('basic1INCH', 'basic1INCH', erc20Pods.address);
         await delegationPod.deployed();
         const amount = ether('1');
         return { erc20Pods, delegationPod, amount };
