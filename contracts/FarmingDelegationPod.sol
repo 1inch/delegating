@@ -3,10 +3,10 @@
 pragma solidity ^0.8.0;
 
 import "./TokenizedDelegationPod.sol";
-import "./interfaces/IFarmedDelegationPod.sol";
+import "./interfaces/IFarmingDelegationPod.sol";
 import "@1inch/farming/contracts/MultiFarmingPod.sol";
 
-contract FarmingDelegationPod is IFarmedDelegationPod, TokenizedDelegationPod {
+contract FarmingDelegationPod is IFarmingDelegationPod, TokenizedDelegationPod {
     error DefaultFarmTokenMismatch();
 
     uint256 private constant _MAX_FARM_REWARDS = 3;
