@@ -2,7 +2,7 @@ const { constants, expect, ether } = require('@1inch/solidity-utils');
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { ethers } = require('hardhat');
 
-describe('FarmedDelegationPod', function () {
+describe('FarmingDelegationPod', function () {
     let addr1, addr2, delegatee, newDelegatee;
     const MAX_SHARE_PODS = 3;
     const SHARE_PODS_GASLIMIT = 150000;
@@ -16,8 +16,8 @@ describe('FarmedDelegationPod', function () {
         const Erc20PodsMock = await ethers.getContractFactory('ERC20PodsMock');
         const erc20Pods = await Erc20PodsMock.deploy('ERC20PodsMock', 'EPM', 5, ERC20_PODS_GASLIMIT);
         await erc20Pods.deployed();
-        const FarmedDelegationPod = await ethers.getContractFactory('FarmedDelegationPod');
-        const delegationPod = await FarmedDelegationPod.deploy('FarmedDelegationPod', 'FDP', erc20Pods.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
+        const FarmingDelegationPod = await ethers.getContractFactory('FarmingDelegationPod');
+        const delegationPod = await FarmingDelegationPod.deploy('FarmingDelegationPod', 'FDP', erc20Pods.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
         await delegationPod.deployed();
         const amount = ether('1');
         return { erc20Pods, delegationPod, amount };
@@ -76,8 +76,8 @@ describe('FarmedDelegationPod', function () {
             const { delegationPod } = await loadFixture(initContractsAndRegister);
 
             const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
-            const FarmedDelegationPod = await ethers.getContractFactory('FarmedDelegationPod');
-            const farmPod = await FarmedDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
+            const FarmingDelegationPod = await ethers.getContractFactory('FarmingDelegationPod');
+            const farmPod = await FarmingDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
             await farmPod.deployed();
             await delegationPod.connect(delegatee).setDefaultFarm(farmPod.address);
 
@@ -96,8 +96,8 @@ describe('FarmedDelegationPod', function () {
 
             const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
 
-            const FarmedDelegationPod = await ethers.getContractFactory('FarmedDelegationPod');
-            const farmPod = await FarmedDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
+            const FarmingDelegationPod = await ethers.getContractFactory('FarmingDelegationPod');
+            const farmPod = await FarmingDelegationPod.deploy('FarmPod', 'FRM', delegatedShare.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
             await farmPod.deployed();
             await delegationPod.connect(delegatee).setDefaultFarm(farmPod.address);
 

@@ -6,9 +6,7 @@ import "./TokenizedDelegationPod.sol";
 import "./interfaces/IFarmedDelegationPod.sol";
 import "@1inch/farming/contracts/MultiFarmingPod.sol";
 
-import "hardhat/console.sol";
-
-contract FarmedDelegationPod is IFarmedDelegationPod, TokenizedDelegationPod {
+contract FarmingDelegationPod is IFarmedDelegationPod, TokenizedDelegationPod {
     error DefaultFarmTokenMismatch();
 
     uint256 private constant _MAX_FARM_REWARDS = 3;
@@ -30,7 +28,6 @@ contract FarmedDelegationPod is IFarmedDelegationPod, TokenizedDelegationPod {
         if (defaultFarm != address(0)) {
             registration[delegatee].addDefaultFarmIfNeeded(msg.sender, defaultFarm);
         }
-        // console.log(balanceOf(delegatee));
     }
 
     function setDefaultFarm(address farm) external onlyRegistered {
