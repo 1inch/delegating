@@ -19,7 +19,9 @@ contract FarmingDelegationPod is IFarmingDelegationPod, TokenizedDelegationPod {
 
     function register(string memory name, string memory symbol) public override(ITokenizedDelegationPod, TokenizedDelegationPod) returns(IDelegatedShare shareToken) {
         shareToken = super.register(name, symbol);
-        defaultFarms[msg.sender] = address(new MultiFarmingPod(shareToken, _MAX_FARM_REWARDS));
+        MultiFarmingPod farm = new MultiFarmingPod(shareToken, _MAX_FARM_REWARDS);
+        farm.transferOwnership(msg.sender);
+        defaultFarms[msg.sender] = address(farm);
     }
 
     function delegate(address delegatee) public override(IDelegationPod, TokenizedDelegationPod) {
