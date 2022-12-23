@@ -1,6 +1,6 @@
 {
     "name": "@1inch/delegating",
-    "version": "0.0.19",
+    "version": "0.0.20",
     "description": "Set of contracts for delegating incentives",
     "homepage": "https://github.com/1inch/delegating#readme",
     "author": "1inch",
@@ -15,7 +15,7 @@
     "license": "MIT",
     "dependencies": {
         "@1inch/erc20-pods": "0.0.16",
-        "@1inch/farming": "1.2.4",
+        "@1inch/farming": "1.2.5",
         "@1inch/solidity-utils": "2.2.5",
         "@openzeppelin/contracts": "4.8.0",
         "hardhat-dependency-compiler": "1.1.3"
