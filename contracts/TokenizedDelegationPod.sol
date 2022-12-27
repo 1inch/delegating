@@ -36,8 +36,8 @@ contract TokenizedDelegationPod is ITokenizedDelegationPod, DelegationPod {
         super.delegate(delegatee);
     }
 
-    function register(string memory name, string memory symbol) public virtual onlyNotRegistered returns(IDelegatedShare shareToken) {
-        shareToken = new DelegatedShare(name, symbol, maxSharePods, sharePodGasLimit);
+    function register(string memory name_, string memory symbol_) public virtual onlyNotRegistered returns(IDelegatedShare shareToken) {
+        shareToken = new DelegatedShare(name_, symbol_, maxSharePods, sharePodGasLimit);
         registration[msg.sender] = shareToken;
         emit RegisterDelegatee(msg.sender);
     }

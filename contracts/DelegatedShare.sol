@@ -19,11 +19,11 @@ contract DelegatedShare is IDelegatedShare, ERC20Pods {
     }
 
     constructor(
-        string memory name,
-        string memory symbol,
-        uint256 maxUserPods,
-        uint256 podCallGasLimit
-    ) ERC20(name, symbol) ERC20Pods(maxUserPods, podCallGasLimit) {
+        string memory name_,
+        string memory symbol_,
+        uint256 maxUserPods_,
+        uint256 podCallGasLimit_
+    ) ERC20(name_, symbol_) ERC20Pods(maxUserPods_, podCallGasLimit_) {
         _owner = msg.sender;
     }
 
