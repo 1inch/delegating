@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 import "./DelegationPod.sol";
 import "./DelegatedShare.sol";
 import "./interfaces/ITokenizedDelegationPod.sol";
-import "./interfaces/IDelegatedShare.sol";
 
 contract TokenizedDelegationPod is ITokenizedDelegationPod, DelegationPod {
     error NotRegisteredDelegatee();
