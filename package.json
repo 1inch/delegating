@@ -14,9 +14,9 @@
     },
     "license": "MIT",
     "dependencies": {
-        "@1inch/erc20-pods": "0.0.16",
+        "@1inch/erc20-pods": "0.0.17",
         "@1inch/farming": "1.2.5",
-        "@1inch/solidity-utils": "2.2.5",
+        "@1inch/solidity-utils": "2.2.16",
         "@openzeppelin/contracts": "4.8.0",
         "hardhat-dependency-compiler": "1.1.3"
     },
