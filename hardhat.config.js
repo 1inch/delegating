@@ -33,6 +33,8 @@ module.exports = {
     dependencyCompiler: {
         paths: [
             '@1inch/erc20-pods/contracts/mocks/ERC20PodsMock.sol',
+            '@1inch/erc20-pods/contracts/mocks/PodMock.sol',
+            '@1inch/erc20-pods/contracts/mocks/WrongPodMock.sol',
         ],
     },
 };

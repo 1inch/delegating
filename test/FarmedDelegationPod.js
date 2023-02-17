@@ -1,6 +1,7 @@
 const { constants, expect, ether } = require('@1inch/solidity-utils');
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers');
 const { ethers } = require('hardhat');
+const { shouldBehaveLikeERC20Pods } = require('@1inch/erc20-pods/test/behaviors/ERC20Pods.behavior.js');
 
 describe('FarmingDelegationPod', function () {
     let addr1, addr2, delegatee, newDelegatee;
@@ -10,6 +11,30 @@ describe('FarmingDelegationPod', function () {
 
     before(async function () {
         [addr1, addr2, delegatee, newDelegatee] = await ethers.getSigners();
+    });
+
+    describe('shouldBehaveLikeERC20Pods', function () {
+        async function initContractsBehavior () {
+            const Erc20PodsMock = await ethers.getContractFactory('ERC20PodsMock');
+            const delegatedToken = await Erc20PodsMock.deploy('ERC20PodsMock', 'EPM', 5, ERC20_PODS_GASLIMIT);
+            await delegatedToken.deployed();
+            const FarmingDelegationPod = await ethers.getContractFactory('FarmingDelegationPod');
+            const delegationPod = await FarmingDelegationPod.deploy('FarmingDelegationPod', 'FDP', delegatedToken.address, MAX_SHARE_PODS, SHARE_PODS_GASLIMIT);
+            await delegationPod.deployed();
+            await delegatedToken.addPod(delegationPod.address);
+            await delegationPod.functions['register(string,string)']('TestTokenName', 'TestTokenSymbol');
+            await delegationPod.delegate(addr1.address);
+
+            const amount = ether('1');
+            await delegatedToken.mint(addr1.address, amount);
+
+            const erc20Pods = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(addr1.address));
+            await erc20Pods.removePod(await delegationPod.defaultFarms(addr1.address));
+            const POD_LIMITS = MAX_SHARE_PODS;
+            return { erc20Pods, POD_LIMITS, amount };
+        };
+
+        shouldBehaveLikeERC20Pods(initContractsBehavior);
     });
 
     async function initContracts () {
