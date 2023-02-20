@@ -8,12 +8,12 @@ import "./interfaces/IDelegatedShare.sol";
 contract DelegatedShare is IDelegatedShare, ERC20Pods {
     error ApproveDisabled();
     error TransferDisabled();
-    error NotOwner();
+    error NotOwnerPod();
 
-    address immutable private _owner;
+    address immutable public ownerPod;
 
-    modifier onlyOwner {
-        if (msg.sender != _owner) revert NotOwner();
+    modifier onlyOwnerPod {
+        if (msg.sender != ownerPod) revert NotOwnerPod();
         _;
     }
 
@@ -23,20 +23,20 @@ contract DelegatedShare is IDelegatedShare, ERC20Pods {
         uint256 maxUserPods_,
         uint256 podCallGasLimit_
     ) ERC20(name_, symbol_) ERC20Pods(maxUserPods_, podCallGasLimit_) {
-        _owner = msg.sender;
+        ownerPod = msg.sender;
     }
 
-    function addDefaultFarmIfNeeded(address account, address farm) external onlyOwner {
+    function addDefaultFarmIfNeeded(address account, address farm) external onlyOwnerPod {
         if (!hasPod(account, farm)) {
             _addPod(account, farm);
         }
     }
 
-    function mint(address account, uint256 amount) external onlyOwner {
+    function mint(address account, uint256 amount) external onlyOwnerPod {
         _mint(account, amount);
     }
 
-    function burn(address account, uint256 amount) external onlyOwner {
+    function burn(address account, uint256 amount) external onlyOwnerPod {
         _burn(account, amount);
     }
 
