@@ -82,9 +82,9 @@ describe('FarmingDelegationPod', function () {
                 await delegationPod.connect(delegatee).functions['register(string,string)']('TestTokenName', 'TestTokenSymbol');
                 const delegatedShare = await ethers.getContractAt('DelegatedShare', await delegationPod.registration(delegatee.address));
                 await expect(delegatedShare.mint(addr1.address, '1000'))
-                    .to.be.revertedWithCustomError(delegatedShare, 'NotOwner');
+                    .to.be.revertedWithCustomError(delegatedShare, 'NotOwnerPod');
                 await expect(delegatedShare.burn(addr1.address, '1000'))
-                    .to.be.revertedWithCustomError(delegatedShare, 'NotOwner');
+                    .to.be.revertedWithCustomError(delegatedShare, 'NotOwnerPod');
             });
 
             it('should not double registrate', async function () {
