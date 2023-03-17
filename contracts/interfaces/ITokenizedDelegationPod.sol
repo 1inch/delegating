@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "./IDelegationPod.sol";
-import "./IDelegatedShare.sol";
+import { IDelegationPod } from "./IDelegationPod.sol";
+import { IDelegatedShare } from "./IDelegatedShare.sol";
 
 interface ITokenizedDelegationPod is IDelegationPod {
     event RegisterDelegatee(address delegatee);

@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "@1inch/erc20-pods/contracts/ERC20Pods.sol";
-import "./interfaces/IDelegatedShare.sol";
+import { IERC20, ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { ERC20Pods } from "@1inch/erc20-pods/contracts/ERC20Pods.sol";
+import { IDelegatedShare } from "./interfaces/IDelegatedShare.sol";
 
 contract DelegatedShare is IDelegatedShare, ERC20Pods {
     error ApproveDisabled();

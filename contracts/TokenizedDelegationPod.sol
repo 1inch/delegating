@@ -2,9 +2,10 @@
 
 pragma solidity ^0.8.0;
 
-import "./DelegationPod.sol";
-import "./DelegatedShare.sol";
-import "./interfaces/ITokenizedDelegationPod.sol";
+import { IERC20Pods } from "@1inch/erc20-pods/contracts/interfaces/IERC20Pods.sol";
+import { IDelegationPod, DelegationPod } from "./DelegationPod.sol";
+import { IDelegatedShare, DelegatedShare } from "./DelegatedShare.sol";
+import { ITokenizedDelegationPod } from "./interfaces/ITokenizedDelegationPod.sol";
 
 contract TokenizedDelegationPod is ITokenizedDelegationPod, DelegationPod {
     error NotRegisteredDelegatee();
