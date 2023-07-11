@@ -2,9 +2,11 @@
 
 pragma solidity ^0.8.0;
 
-import "./TokenizedDelegationPod.sol";
-import "./interfaces/IFarmingDelegationPod.sol";
-import "@1inch/farming/contracts/MultiFarmingPod.sol";
+import { IPod } from "@1inch/erc20-pods/contracts/interfaces/IPod.sol";
+import { IERC20Pods } from "@1inch/erc20-pods/contracts/interfaces/IERC20Pods.sol";
+import { MultiFarmingPod } from "@1inch/farming/contracts/MultiFarmingPod.sol";
+import { ITokenizedDelegationPod, TokenizedDelegationPod, IDelegatedShare, IDelegationPod } from "./TokenizedDelegationPod.sol";
+import { IFarmingDelegationPod } from "./interfaces/IFarmingDelegationPod.sol";
 
 contract FarmingDelegationPod is IFarmingDelegationPod, TokenizedDelegationPod {
     error DefaultFarmTokenMismatch();
@@ -33,7 +35,7 @@ contract FarmingDelegationPod is IFarmingDelegationPod, TokenizedDelegationPod {
     }
 
     function setDefaultFarm(address farm) external onlyRegistered {
-        if (farm != address(0) && Pod(farm).token() != registration[msg.sender]) revert DefaultFarmTokenMismatch();
+        if (farm != address(0) && IPod(farm).token() != registration[msg.sender]) revert DefaultFarmTokenMismatch();
         defaultFarms[msg.sender] = farm;
         emit DefaultFarmSet(farm);
     }

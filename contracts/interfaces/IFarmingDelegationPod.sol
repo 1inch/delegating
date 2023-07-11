@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./ITokenizedDelegationPod.sol";
+import { ITokenizedDelegationPod } from "./ITokenizedDelegationPod.sol";
 
 interface IFarmingDelegationPod is ITokenizedDelegationPod {
     event DefaultFarmSet(address defaultFarm);

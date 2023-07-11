@@ -2,11 +2,10 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@1inch/erc20-pods/contracts/interfaces/IERC20Pods.sol";
-import "@1inch/erc20-pods/contracts/Pod.sol";
-
-import "./interfaces/IDelegationPod.sol";
+import { IERC20, ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { Pod } from "@1inch/erc20-pods/contracts/Pod.sol";
+import { IERC20Pods } from "@1inch/erc20-pods/contracts/interfaces/IERC20Pods.sol";
+import { IDelegationPod } from "./interfaces/IDelegationPod.sol";
 
 contract DelegationPod is IDelegationPod, Pod, ERC20 {
     error ApproveDisabled();
