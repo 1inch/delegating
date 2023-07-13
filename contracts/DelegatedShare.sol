@@ -3,41 +3,41 @@
 pragma solidity ^0.8.0;
 
 import { IERC20, ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import { ERC20Pods } from "@1inch/erc20-pods/contracts/ERC20Pods.sol";
+import { ERC20Plugins } from "@1inch/token-plugins/contracts/ERC20Plugins.sol";
 import { IDelegatedShare } from "./interfaces/IDelegatedShare.sol";
 
-contract DelegatedShare is IDelegatedShare, ERC20Pods {
+contract DelegatedShare is IDelegatedShare, ERC20Plugins {
     error ApproveDisabled();
     error TransferDisabled();
-    error NotOwnerPod();
+    error NotOwnerPlugin();
 
-    address immutable public ownerPod;
+    address immutable public ownerPlugin;
 
-    modifier onlyOwnerPod {
-        if (msg.sender != ownerPod) revert NotOwnerPod();
+    modifier onlyOwnerPlugin {
+        if (msg.sender != ownerPlugin) revert NotOwnerPlugin();
         _;
     }
 
     constructor(
         string memory name_,
         string memory symbol_,
-        uint256 maxUserPods_,
-        uint256 podCallGasLimit_
-    ) ERC20(name_, symbol_) ERC20Pods(maxUserPods_, podCallGasLimit_) {
-        ownerPod = msg.sender;
+        uint256 maxUserPlugins_,
+        uint256 pluginCallGasLimit_
+    ) ERC20(name_, symbol_) ERC20Plugins(maxUserPlugins_, pluginCallGasLimit_) {
+        ownerPlugin = msg.sender;
     }
 
-    function addDefaultFarmIfNeeded(address account, address farm) external onlyOwnerPod {
-        if (!hasPod(account, farm)) {
-            _addPod(account, farm);
+    function addDefaultFarmIfNeeded(address account, address farm) external onlyOwnerPlugin {
+        if (!hasPlugin(account, farm)) {
+            _addPlugin(account, farm);
         }
     }
 
-    function mint(address account, uint256 amount) external onlyOwnerPod {
+    function mint(address account, uint256 amount) external onlyOwnerPlugin {
         _mint(account, amount);
     }
 
-    function burn(address account, uint256 amount) external onlyOwnerPod {
+    function burn(address account, uint256 amount) external onlyOwnerPlugin {
         _burn(account, amount);
     }
 
