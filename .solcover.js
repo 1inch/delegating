@@ -19,7 +19,7 @@ module.exports = {
                     "gvf" +                        // Run full inliner
                     "CTUa[r]LSsTFOtfDna[r]Il" + // SSA plus simplify
                 "]" +
-                "jml[jl] VTOl jml",
+                "jml[jl] VTOl jml : fDnTO",
         },
     },
     skipFiles: [
