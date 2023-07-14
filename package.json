@@ -1,6 +1,6 @@
 {
     "name": "@1inch/delegating",
-    "version": "0.0.22",
+    "version": "1.0.0",
     "description": "Set of contracts for delegating incentives",
     "homepage": "https://github.com/1inch/delegating#readme",
     "author": "1inch",
