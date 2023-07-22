@@ -6,7 +6,7 @@ import { SafeCast } from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import { Checkpoints } from "@openzeppelin/contracts/utils/Checkpoints.sol";
 import { IERC20Plugins, DelegationPlugin } from "./DelegationPlugin.sol";
 
-contract DelegationSnapshotPlugin is DelegationPlugin {
+contract VotingPlugin is DelegationPlugin {
     using Checkpoints for Checkpoints.Trace224;
 
     error ERC5805FutureLookup(uint256 timepoint, uint48 clock);
