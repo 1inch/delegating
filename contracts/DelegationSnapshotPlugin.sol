@@ -19,6 +19,20 @@ contract DelegationSnapshotPlugin is DelegationPlugin {
     {}  // solhint-disable-line no-empty-blocks
 
     /**
+     * @dev Get number of checkpoints for `account`.
+     */
+    function numCheckpoints(address account) public view virtual returns (uint32) {
+        return SafeCast.toUint32(_delegateCheckpoints[account].length());
+    }
+
+    /**
+     * @dev Get the `pos`-th checkpoint for `account`.
+     */
+    function checkpoints(address account, uint32 pos) public view virtual returns (Checkpoints.Checkpoint224 memory) {
+        return _delegateCheckpoints[account]._checkpoints[pos];
+    }
+
+    /**
      * @dev Clock used for flagging checkpoints. Can be overridden to implement timestamp based
      * checkpoints (and voting), in which case {CLOCK_MODE} should be overridden as well to match.
      */
