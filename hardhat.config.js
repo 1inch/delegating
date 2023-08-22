@@ -1,5 +1,5 @@
-require('@nomiclabs/hardhat-ethers');
-require('@nomiclabs/hardhat-etherscan');
+require('@nomicfoundation/hardhat-ethers');
+require('@nomicfoundation/hardhat-verify');
 require('@nomicfoundation/hardhat-chai-matchers');
 require('solidity-coverage');
 require('hardhat-dependency-compiler');
@@ -12,12 +12,13 @@ const { networks, etherscan } = require('./hardhat.networks');
 module.exports = {
     etherscan,
     solidity: {
-        version: '0.8.17',
+        version: '0.8.19',
         settings: {
             optimizer: {
                 enabled: true,
                 runs: 1000000,
             },
+            viaIR: true,
         },
     },
     networks,
@@ -32,9 +33,9 @@ module.exports = {
     },
     dependencyCompiler: {
         paths: [
-            '@1inch/erc20-pods/contracts/mocks/ERC20PodsMock.sol',
-            '@1inch/erc20-pods/contracts/mocks/PodMock.sol',
-            '@1inch/erc20-pods/contracts/mocks/WrongPodMock.sol',
+            '@1inch/token-plugins/contracts/mocks/ERC20PluginsMock.sol',
+            '@1inch/token-plugins/contracts/mocks/PluginMock.sol',
+            '@1inch/token-plugins/contracts/mocks/BadPluginMock.sol',
         ],
     },
 };

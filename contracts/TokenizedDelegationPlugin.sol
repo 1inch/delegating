@@ -2,16 +2,17 @@
 
 pragma solidity ^0.8.0;
 
-import "./DelegationPod.sol";
-import "./DelegatedShare.sol";
-import "./interfaces/ITokenizedDelegationPod.sol";
+import { IERC20Plugins } from "@1inch/token-plugins/contracts/interfaces/IERC20Plugins.sol";
+import { IDelegationPlugin, DelegationPlugin } from "./DelegationPlugin.sol";
+import { IDelegatedShare, DelegatedShare } from "./DelegatedShare.sol";
+import { ITokenizedDelegationPlugin } from "./interfaces/ITokenizedDelegationPlugin.sol";
 
-contract TokenizedDelegationPod is ITokenizedDelegationPod, DelegationPod {
+contract TokenizedDelegationPlugin is ITokenizedDelegationPlugin, DelegationPlugin {
     error NotRegisteredDelegatee();
     error AlreadyRegistered();
 
-    uint256 public immutable maxSharePods;
-    uint256 public immutable sharePodGasLimit;
+    uint256 public immutable maxSharePlugins;
+    uint256 public immutable sharePluginGasLimit;
 
     mapping(address => IDelegatedShare) public registration;
 
@@ -25,18 +26,18 @@ contract TokenizedDelegationPod is ITokenizedDelegationPod, DelegationPod {
         _;
     }
 
-    constructor(string memory name_, string memory symbol_, IERC20Pods token_, uint256 maxSharePods_, uint256 sharePodGasLimit_) DelegationPod(name_, symbol_, token_) {
-        maxSharePods = maxSharePods_;
-        sharePodGasLimit = sharePodGasLimit_;
+    constructor(string memory name_, string memory symbol_, IERC20Plugins token_, uint256 maxSharePlugins_, uint256 sharePluginGasLimit_) DelegationPlugin(name_, symbol_, token_) {
+        maxSharePlugins = maxSharePlugins_;
+        sharePluginGasLimit = sharePluginGasLimit_;
     }
 
-    function delegate(address delegatee) public virtual override(IDelegationPod, DelegationPod) {
+    function delegate(address delegatee) public virtual override(IDelegationPlugin, DelegationPlugin) {
         if (delegatee != address(0) && address(registration[delegatee]) == address(0)) revert NotRegisteredDelegatee();
         super.delegate(delegatee);
     }
 
     function register(string memory name_, string memory symbol_) public virtual onlyNotRegistered returns(IDelegatedShare shareToken) {
-        shareToken = new DelegatedShare(name_, symbol_, maxSharePods, sharePodGasLimit);
+        shareToken = new DelegatedShare(name_, symbol_, maxSharePlugins, sharePluginGasLimit);
         registration[msg.sender] = shareToken;
         emit RegisterDelegatee(msg.sender);
     }
