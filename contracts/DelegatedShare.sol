@@ -25,7 +25,7 @@ contract DelegatedShare is IDelegatedShare, ERC20Plugins {
     /// @param name_ The name of the token.
     /// @param symbol_ The symbol of the token.
     /// @param maxUserPlugins_ The maximum number of user plugins.
-    /// @param podCallGasLimit_ The gas limit for plugin calls.
+    /// @param pluginCallGasLimit_ The gas limit for plugin calls.
     constructor(
         string memory name_,
         string memory symbol_,
