@@ -75,12 +75,4 @@ contract DelegatedShare is IDelegatedShare, ERC20Plugins {
     function transferFrom(address /* from */, address /* to */, uint256 /* amount */) public pure override(IERC20, ERC20) returns (bool) {
         revert TransferDisabled();
     }
-
-    function increaseAllowance(address /* spender */, uint256 /* addedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
-    }
-
-    function decreaseAllowance(address /* spender */, uint256 /* subtractedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
-    }
 }

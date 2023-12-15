@@ -2,24 +2,23 @@
 # yarn lockfile v1
 
 
-"@1inch/farming@3.1.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@1inch/farming/-/farming-3.1.0.tgz#a3e1bb4d6a99256ccc47d6d418644535bb96cff4"
-  integrity sha512-KrTNsq2tHqTM3TAVYlfC9G0qqYB8uuoJj9RkHxWuSg8NIZ3RzKejzDvNeVScaJFFWDJ+4vWKFUw5WHIUyoETEg==
+"@1inch/farming@git+https://github.com/1inch/farming.git#d140c9a39ed46eb6dbef9c4970b40c5528233c53":
+  version "3.2.0"
+  resolved "git+https://github.com/1inch/farming.git#d140c9a39ed46eb6dbef9c4970b40c5528233c53"
   dependencies:
-    "@1inch/solidity-utils" "3.0.1"
-    "@1inch/token-plugins" "1.1.2"
-    "@openzeppelin/contracts" "4.9.2"
+    "@1inch/solidity-utils" "3.5.4"
+    "@1inch/token-plugins" "git+https://github.com/1inch/token-plugins.git#4d113410faedfbd385df6c99a4481e3e0d001e08"
+    "@openzeppelin/contracts" "5.0.1"
 
-"@1inch/solidity-utils@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@1inch/solidity-utils/-/solidity-utils-3.0.1.tgz#afce60992fff724b09d570801ed0381ac31402cf"
-  integrity sha512-KbLhh1JgjBIJAq6B+AGOuyLNlEf5bRvoMZb509YMeec3s3iLbTrtI5D76b+HGKR98wU3HuRiDac/7j4ck2bjBQ==
+"@1inch/solidity-utils@3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@1inch/solidity-utils/-/solidity-utils-3.3.0.tgz#409dec87901f465ca7cd291df30155f50f5ab34a"
+  integrity sha512-mkS/Ej1wXO+Xa3ztVB5KKmKVwXCp5zrXcLiCEwkHyouOBauxYWp4/icj/wOBapIwVaju9ha5u1HlwbIlbl2gbQ==
   dependencies:
     "@metamask/eth-sig-util" "6.0.0"
     "@nomicfoundation/hardhat-ethers" "3.0.3"
     "@nomicfoundation/hardhat-network-helpers" "1.0.8"
-    "@openzeppelin/contracts" "4.9.2"
+    "@openzeppelin/contracts" "5.0.0"
     "@uniswap/permit2-sdk" "1.2.0"
     ethereumjs-util "7.1.5"
     ethers "6.6.3"
@@ -43,21 +42,12 @@
     hardhat "2.19.1"
     hardhat-deploy "0.11.43"
 
-"@1inch/token-plugins@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@1inch/token-plugins/-/token-plugins-1.1.2.tgz#5381f7156c6d98760da838cd1002c38cb1f45107"
-  integrity sha512-ACstC+LpIbOdm7KwBG6KddjtaWHyhHfn6/2LpBdnx6PMPlgbR+IsHF3G61oah7mDtR2TurtMGQU1UCpTk2coyg==
+"@1inch/token-plugins@git+https://github.com/1inch/token-plugins.git#4d113410faedfbd385df6c99a4481e3e0d001e08":
+  version "1.3.0"
+  resolved "git+https://github.com/1inch/token-plugins.git#4d113410faedfbd385df6c99a4481e3e0d001e08"
   dependencies:
-    "@1inch/solidity-utils" "3.0.1"
-    "@openzeppelin/contracts" "4.9.2"
-
-"@1inch/token-plugins@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@1inch/token-plugins/-/token-plugins-1.2.1.tgz#31b06b1d8a449100d006263d259e070e51f45d24"
-  integrity sha512-A17X1ShPb3fl8rgYGcP6Nt7qcXpvcIDTZskub08KXhr5IGnU3e2bPX+Exnx3lEn5e/gGu8MZdcAZAd2bAEfQaw==
-  dependencies:
-    "@1inch/solidity-utils" "3.0.1"
-    "@openzeppelin/contracts" "4.9.2"
+    "@1inch/solidity-utils" "3.3.0"
+    "@openzeppelin/contracts" "5.0.0"
 
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
@@ -972,11 +962,6 @@
     "@nomicfoundation/solidity-analyzer-win32-arm64-msvc" "0.1.1"
     "@nomicfoundation/solidity-analyzer-win32-ia32-msvc" "0.1.1"
     "@nomicfoundation/solidity-analyzer-win32-x64-msvc" "0.1.1"
-
-"@openzeppelin/contracts@4.9.2":
-  version "4.9.2"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.9.2.tgz#1cb2d5e4d3360141a17dbc45094a8cad6aac16c1"
-  integrity sha512-mO+y6JaqXjWeMh9glYVzVu8HYPGknAAnWyxTRhGeckOruyXQMNnlcW6w/Dx9ftLeIQk6N+ZJFuVmTwF7lEIFrg==
 
 "@openzeppelin/contracts@5.0.0":
   version "5.0.0"

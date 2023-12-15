@@ -64,12 +64,4 @@ contract DelegationPlugin is IDelegationPlugin, Plugin, ERC20 {
     function approve(address /* spender */, uint256 /* amount */) public pure override(ERC20, IERC20) returns (bool) {
         revert ApproveDisabled();
     }
-
-    function increaseAllowance(address /* spender */, uint256 /* addedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
-    }
-
-    function decreaseAllowance(address /* spender */, uint256 /* subtractedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
-    }
 }
