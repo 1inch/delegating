@@ -12,7 +12,7 @@ contract DelegatedShare is IDelegatedShare, ERC20Plugins {
     error ApproveDisabled();
     error TransferDisabled();
     error NotOwnerPlugin();
-    
+
     /// @notice The address of the owner plugin.
     address immutable public ownerPlugin;
 
