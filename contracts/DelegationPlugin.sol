@@ -22,7 +22,7 @@ contract DelegationPlugin is IDelegationPlugin, Plugin, ERC20 {
         if (prevDelegatee != delegatee) {
             delegated[msg.sender] = delegatee;
             emit Delegated(msg.sender, delegatee);
-            uint256 balance = IERC20Plugins(token).pluginBalanceOf(address(this), msg.sender);
+            uint256 balance = IERC20Plugins(TOKEN).pluginBalanceOf(address(this), msg.sender);
             if (balance > 0) {
                 _updateBalances(msg.sender, msg.sender, prevDelegatee, delegatee, balance);
             }
