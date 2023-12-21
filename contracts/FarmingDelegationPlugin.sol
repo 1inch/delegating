@@ -21,8 +21,7 @@ contract FarmingDelegationPlugin is IFarmingDelegationPlugin, TokenizedDelegatio
 
     function register(string memory name_, string memory symbol_) public override(ITokenizedDelegationPlugin, TokenizedDelegationPlugin) returns(IDelegatedShare shareToken) {
         shareToken = super.register(name_, symbol_);
-        MultiFarmingPlugin farm = new MultiFarmingPlugin(shareToken, _MAX_FARM_REWARDS);
-        farm.transferOwnership(msg.sender);
+        MultiFarmingPlugin farm = new MultiFarmingPlugin(shareToken, _MAX_FARM_REWARDS, msg.sender);
         defaultFarms[msg.sender] = address(farm);
     }
 
@@ -35,7 +34,7 @@ contract FarmingDelegationPlugin is IFarmingDelegationPlugin, TokenizedDelegatio
     }
 
     function setDefaultFarm(address farm) external onlyRegistered {
-        if (farm != address(0) && IPlugin(farm).token() != registration[msg.sender]) revert DefaultFarmTokenMismatch();
+        if (farm != address(0) && IPlugin(farm).TOKEN() != registration[msg.sender]) revert DefaultFarmTokenMismatch();
         defaultFarms[msg.sender] = farm;
         emit DefaultFarmSet(farm);
     }

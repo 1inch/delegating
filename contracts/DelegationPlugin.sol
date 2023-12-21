@@ -22,7 +22,7 @@ contract DelegationPlugin is IDelegationPlugin, Plugin, ERC20 {
         if (prevDelegatee != delegatee) {
             delegated[msg.sender] = delegatee;
             emit Delegated(msg.sender, delegatee);
-            uint256 balance = IERC20Plugins(token).pluginBalanceOf(address(this), msg.sender);
+            uint256 balance = IERC20Plugins(TOKEN).pluginBalanceOf(address(this), msg.sender);
             if (balance > 0) {
                 _updateBalances(msg.sender, msg.sender, prevDelegatee, delegatee, balance);
             }
@@ -62,14 +62,6 @@ contract DelegationPlugin is IDelegationPlugin, Plugin, ERC20 {
     }
 
     function approve(address /* spender */, uint256 /* amount */) public pure override(ERC20, IERC20) returns (bool) {
-        revert ApproveDisabled();
-    }
-
-    function increaseAllowance(address /* spender */, uint256 /* addedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
-    }
-
-    function decreaseAllowance(address /* spender */, uint256 /* subtractedValue */) public pure override returns (bool) {
         revert ApproveDisabled();
     }
 }

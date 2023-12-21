@@ -12,13 +12,13 @@ contract DelegatedShare is IDelegatedShare, ERC20Plugins {
     error ApproveDisabled();
     error TransferDisabled();
     error NotOwnerPlugin();
-    
+
     /// @notice The address of the owner plugin.
-    address immutable public ownerPlugin;
+    address immutable public OWNER_PLUGIN;
 
     /// @dev Throws if called by any account other than the ownerPlugin.
     modifier onlyOwnerPlugin {
-        if (msg.sender != ownerPlugin) revert NotOwnerPlugin();
+        if (msg.sender != OWNER_PLUGIN) revert NotOwnerPlugin();
         _;
     }
 
@@ -32,7 +32,7 @@ contract DelegatedShare is IDelegatedShare, ERC20Plugins {
         uint256 maxUserPlugins_,
         uint256 pluginCallGasLimit_
     ) ERC20(name_, symbol_) ERC20Plugins(maxUserPlugins_, pluginCallGasLimit_) {
-        ownerPlugin = msg.sender;
+        OWNER_PLUGIN = msg.sender;
     }
 
     /// @notice Add default farm for an account if it doesn't exist.
@@ -74,13 +74,5 @@ contract DelegatedShare is IDelegatedShare, ERC20Plugins {
 
     function transferFrom(address /* from */, address /* to */, uint256 /* amount */) public pure override(IERC20, ERC20) returns (bool) {
         revert TransferDisabled();
-    }
-
-    function increaseAllowance(address /* spender */, uint256 /* addedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
-    }
-
-    function decreaseAllowance(address /* spender */, uint256 /* subtractedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
     }
 }
