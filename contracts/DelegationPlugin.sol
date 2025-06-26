@@ -3,18 +3,18 @@
 pragma solidity ^0.8.0;
 
 import { IERC20, ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import { Plugin } from "@1inch/token-plugins/contracts/Plugin.sol";
-import { IERC20Plugins } from "@1inch/token-plugins/contracts/interfaces/IERC20Plugins.sol";
+import { Hook } from "@1inch/token-hooks/contracts/Hook.sol";
+import { IERC20Hooks } from "@1inch/token-hooks/contracts/interfaces/IERC20Hooks.sol";
 import { IDelegationPlugin } from "./interfaces/IDelegationPlugin.sol";
 
-contract DelegationPlugin is IDelegationPlugin, Plugin, ERC20 {
+contract DelegationPlugin is IDelegationPlugin, Hook, ERC20 {
     error ApproveDisabled();
     error TransferDisabled();
 
     mapping(address => address) public delegated;
 
-    constructor(string memory name_, string memory symbol_, IERC20Plugins token_)
-        ERC20(name_, symbol_) Plugin(token_)
+    constructor(string memory name_, string memory symbol_, IERC20Hooks token_)
+        ERC20(name_, symbol_) Hook(token_)
     {}  // solhint-disable-line no-empty-blocks
 
     function delegate(address delegatee) public virtual {
@@ -22,7 +22,7 @@ contract DelegationPlugin is IDelegationPlugin, Plugin, ERC20 {
         if (prevDelegatee != delegatee) {
             delegated[msg.sender] = delegatee;
             emit Delegated(msg.sender, delegatee);
-            uint256 balance = IERC20Plugins(TOKEN).pluginBalanceOf(address(this), msg.sender);
+            uint256 balance = IERC20Hooks(TOKEN).hookBalanceOf(address(this), msg.sender);
             if (balance > 0) {
                 _updateBalances(msg.sender, msg.sender, prevDelegatee, delegatee, balance);
             }

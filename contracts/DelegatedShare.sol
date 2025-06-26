@@ -3,12 +3,12 @@
 pragma solidity ^0.8.0;
 
 import { IERC20, ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import { ERC20Plugins } from "@1inch/token-plugins/contracts/ERC20Plugins.sol";
+import { ERC20Hooks } from "@1inch/token-hooks/contracts/ERC20Hooks.sol";
 import { IDelegatedShare } from "./interfaces/IDelegatedShare.sol";
 
 /// @title DelegatedShare
 /// @dev DelegatedShare is a specialized version of an ERC20 token with additional functionalities.
-contract DelegatedShare is IDelegatedShare, ERC20Plugins {
+contract DelegatedShare is IDelegatedShare, ERC20Hooks {
     error ApproveDisabled();
     error TransferDisabled();
     error NotOwnerPlugin();
@@ -24,14 +24,14 @@ contract DelegatedShare is IDelegatedShare, ERC20Plugins {
 
     /// @param name_ The name of the token.
     /// @param symbol_ The symbol of the token.
-    /// @param maxUserPlugins_ The maximum number of user plugins.
-    /// @param pluginCallGasLimit_ The gas limit for plugin calls.
+    /// @param maxUserHooks_ The maximum number of user hooks.
+    /// @param hookCallGasLimit_ The gas limit for hook calls.
     constructor(
         string memory name_,
         string memory symbol_,
-        uint256 maxUserPlugins_,
-        uint256 pluginCallGasLimit_
-    ) ERC20(name_, symbol_) ERC20Plugins(maxUserPlugins_, pluginCallGasLimit_) {
+        uint256 maxUserHooks_,
+        uint256 hookCallGasLimit_
+    ) ERC20(name_, symbol_) ERC20Hooks(maxUserHooks_, hookCallGasLimit_) {
         OWNER_PLUGIN = msg.sender;
     }
 
@@ -40,8 +40,8 @@ contract DelegatedShare is IDelegatedShare, ERC20Plugins {
     /// @param account The account to add default farm for.
     /// @param farm The farm to add.
     function addDefaultFarmIfNeeded(address account, address farm) external onlyOwnerPlugin {
-        if (!hasPlugin(account, farm)) {
-            _addPlugin(account, farm);
+        if (!hasHook(account, farm)) {
+            _addHook(account, farm);
         }
     }
 
