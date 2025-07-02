@@ -25,21 +25,21 @@ function shouldBehaveLikeERC20Hooks (initContracts) {
             return { erc20Hooks, hooks, amount };
         }
 
-        async function initAndCreateReentrancyHooks () {
-            const { erc20Hooks, amount } = await initContracts();
+        // async function initAndCreateReentrancyHooks () {
+        //     const { erc20Hooks, amount } = await initContracts();
 
-            const HookMock = await ethers.getContractFactory('AccountingOnlyHookMock');
-            const hook = await HookMock.deploy('HOOK_TOKEN', 'HT', erc20Hooks);
-            await hook.waitForDeployment();
+        //     const HookMock = await ethers.getContractFactory('AccountingOnlyHookMock');
+        //     const hook = await HookMock.deploy('HOOK_TOKEN', 'HT', erc20Hooks);
+        //     await hook.waitForDeployment();
 
-            const ReentrancyHookMock = await ethers.getContractFactory('ReentrancyHookMock');
-            const attackerHook = await ReentrancyHookMock.deploy(erc20Hooks, hook);
-            await attackerHook.waitForDeployment();
+        //     const ReentrancyHookMock = await ethers.getContractFactory('ReentrancyHookMock');
+        //     const attackerHook = await ReentrancyHookMock.deploy(erc20Hooks, hook);
+        //     await attackerHook.waitForDeployment();
 
-            await erc20Hooks.mint(attackerHook, amount);
+        //     await erc20Hooks.mint(attackerHook, amount);
 
-            return { erc20Hooks, attackerHook, hook, amount };
-        }
+        //     return { erc20Hooks, attackerHook, hook, amount };
+        // }
 
         async function initAndAddAllHooks () {
             const { erc20Hooks, hooks, amount } = await initAndCreateHooks();
