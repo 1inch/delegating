@@ -5,9 +5,9 @@ pragma solidity ^0.8.0;
 import { IERC20, ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { Hook } from "@1inch/token-hooks/contracts/Hook.sol";
 import { IERC20Hooks } from "@1inch/token-hooks/contracts/interfaces/IERC20Hooks.sol";
-import { IDelegationPlugin } from "./interfaces/IDelegationPlugin.sol";
+import { IDelegationHook } from "./interfaces/IDelegationHook.sol";
 
-contract DelegationPlugin is IDelegationPlugin, Hook, ERC20 {
+contract DelegationHook is IDelegationHook, Hook, ERC20 {
     error ApproveDisabled();
     error TransferDisabled();
 

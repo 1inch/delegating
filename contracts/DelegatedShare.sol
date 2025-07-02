@@ -11,14 +11,14 @@ import { IDelegatedShare } from "./interfaces/IDelegatedShare.sol";
 contract DelegatedShare is IDelegatedShare, ERC20Hooks {
     error ApproveDisabled();
     error TransferDisabled();
-    error NotOwnerPlugin();
+    error NotOwnerHook();
 
-    /// @notice The address of the owner plugin.
-    address immutable public OWNER_PLUGIN;
+    /// @notice The address of the owner hook.
+    address immutable public OWNER_HOOK;
 
-    /// @dev Throws if called by any account other than the ownerPlugin.
-    modifier onlyOwnerPlugin {
-        if (msg.sender != OWNER_PLUGIN) revert NotOwnerPlugin();
+    /// @dev Throws if called by any account other than the ownerHook.
+    modifier onlyOwnerHook {
+        if (msg.sender != OWNER_HOOK) revert NotOwnerHook();
         _;
     }
 
@@ -32,32 +32,32 @@ contract DelegatedShare is IDelegatedShare, ERC20Hooks {
         uint256 maxUserHooks_,
         uint256 hookCallGasLimit_
     ) ERC20(name_, symbol_) ERC20Hooks(maxUserHooks_, hookCallGasLimit_) {
-        OWNER_PLUGIN = msg.sender;
+        OWNER_HOOK = msg.sender;
     }
 
     /// @notice Add default farm for an account if it doesn't exist.
-    /// @dev Only callable by the owner plugin.
+    /// @dev Only callable by the owner hook.
     /// @param account The account to add default farm for.
     /// @param farm The farm to add.
-    function addDefaultFarmIfNeeded(address account, address farm) external onlyOwnerPlugin {
+    function addDefaultFarmIfNeeded(address account, address farm) external onlyOwnerHook {
         if (!hasHook(account, farm)) {
             _addHook(account, farm);
         }
     }
 
     /// @notice Mint tokens.
-    /// @dev Only callable by the owner plugin.
+    /// @dev Only callable by the owner hook.
     /// @param account The address to mint tokens to.
     /// @param amount The amount of tokens to mint.
-    function mint(address account, uint256 amount) external onlyOwnerPlugin {
+    function mint(address account, uint256 amount) external onlyOwnerHook {
         _mint(account, amount);
     }
 
     /// @notice Burn tokens.
-    /// @dev Only callable by the owner plugin.
+    /// @dev Only callable by the owner hook.
     /// @param account The address to burn tokens from.
     /// @param amount The amount of tokens to burn.
-    function burn(address account, uint256 amount) external onlyOwnerPlugin {
+    function burn(address account, uint256 amount) external onlyOwnerHook {
         _burn(account, amount);
     }
 

@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import { ITokenizedDelegationPlugin } from "./ITokenizedDelegationPlugin.sol";
+import { ITokenizedDelegationHook } from "./ITokenizedDelegationHook.sol";
 
-interface IFarmingDelegationPlugin is ITokenizedDelegationPlugin {
+interface IFarmingDelegationHook is ITokenizedDelegationHook {
     event DefaultFarmSet(address defaultFarm);
 
     function setDefaultFarm(address farm) external;

@@ -3,11 +3,11 @@
 pragma solidity ^0.8.0;
 
 import { IERC20Hooks } from "@1inch/token-hooks/contracts/interfaces/IERC20Hooks.sol";
-import { IDelegationPlugin, DelegationPlugin } from "./DelegationPlugin.sol";
+import { IDelegationHook, DelegationHook } from "./DelegationHook.sol";
 import { IDelegatedShare, DelegatedShare } from "./DelegatedShare.sol";
-import { ITokenizedDelegationPlugin } from "./interfaces/ITokenizedDelegationPlugin.sol";
+import { ITokenizedDelegationHook } from "./interfaces/ITokenizedDelegationHook.sol";
 
-contract TokenizedDelegationPlugin is ITokenizedDelegationPlugin, DelegationPlugin {
+contract TokenizedDelegationHook is ITokenizedDelegationHook, DelegationHook {
     error NotRegisteredDelegatee();
     error AlreadyRegistered();
 
@@ -26,12 +26,12 @@ contract TokenizedDelegationPlugin is ITokenizedDelegationPlugin, DelegationPlug
         _;
     }
 
-    constructor(string memory name_, string memory symbol_, IERC20Hooks token_, uint256 maxShareHooks_, uint256 shareHookGasLimit_) DelegationPlugin(name_, symbol_, token_) {
+    constructor(string memory name_, string memory symbol_, IERC20Hooks token_, uint256 maxShareHooks_, uint256 shareHookGasLimit_) DelegationHook(name_, symbol_, token_) {
         MAX_SHARE_HOOKS = maxShareHooks_;
         SHARE_HOOK_GAS_LIMIT = shareHookGasLimit_;
     }
 
-    function delegate(address delegatee) public virtual override(IDelegationPlugin, DelegationPlugin) {
+    function delegate(address delegatee) public virtual override(IDelegationHook, DelegationHook) {
         if (delegatee != address(0) && address(registration[delegatee]) == address(0)) revert NotRegisteredDelegatee();
         super.delegate(delegatee);
     }
