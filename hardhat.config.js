@@ -32,9 +32,11 @@ module.exports = {
     },
     dependencyCompiler: {
         paths: [
-            '@1inch/token-plugins/contracts/mocks/ERC20PluginsMock.sol',
-            '@1inch/token-plugins/contracts/mocks/PluginMock.sol',
-            '@1inch/token-plugins/contracts/mocks/BadPluginMock.sol',
+            '@1inch/token-hooks/contracts/mocks/ERC20HooksMock.sol',
+            '@1inch/token-hooks/contracts/mocks/HookMock.sol',
+            '@1inch/token-hooks/contracts/mocks/BadHookMock.sol',
+            '@1inch/token-hooks/contracts/mocks/AccountingOnlyHookMock.sol',
+            '@1inch/token-hooks/contracts/mocks/ReentrancyHookMock.sol',
         ],
     },
 };
